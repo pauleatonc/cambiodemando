@@ -19,6 +19,7 @@ services:
 
   web:
     build: .
+    container_name: cambiodemando_web
     command: >
       sh -c "python manage.py migrate --noinput &&
              python manage.py collectstatic --noinput &&
@@ -28,10 +29,17 @@ services:
       DJANGO_SETTINGS_MODULE: cambiodemando.settings.prod
       DB_HOST: db
     ports:
-      - "8000:8000"
+      - "8001:8000"
     depends_on:
       db:
         condition: service_healthy
+    networks:
+      - default
+      - mda_network_prod
 
 volumes:
   pgdata_prod:
+
+networks:
+  mda_network_prod:
+    external: true
