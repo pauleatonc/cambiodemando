@@ -5,6 +5,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Cambio de mando{% endblock %}</title>
+    {% if adsense_client %}
+    <meta name="google-adsense-account" content="{{ adsense_client }}">
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client }}"
+     crossorigin="anonymous"></script>
+    {% endif %}
     <link rel="icon" type="image/jpeg" href="{% static 'img/favicon.jpg' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

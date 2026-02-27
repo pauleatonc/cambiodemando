@@ -11,7 +11,7 @@
 {% block content %}
 <section class="countdown-section">
   <header class="countdown-header">
-    <h1 class="countdown-title">¿Cuánto falta para que se vaya Kast?</h1>
+    <h1 class="countdown-title">¿Cuánto falta para el cambio de mando?</h1>
   </header>
 
   <div class="countdown-shell">
@@ -19,13 +19,14 @@
       <div class="ad-slot ad-slot-rail">
         {% if adsense_client and adsense_slot_rail_left %}
         <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="{{ adsense_client }}"
-             data-ad-slot="{{ adsense_slot_rail_left }}"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        {% else %}
-        <div class="ad-slot-placeholder">Espacio publicitario</div>
+        style="display:block"
+        data-ad-client="{{ adsense_client }}"
+        data-ad-slot="{{ adsense_slot_rail_left }}"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+        <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
         {% endif %}
       </div>
     </aside>
@@ -99,15 +100,16 @@
         </section>
 
         <div class="ad-slot ad-slot-inline" aria-label="Publicidad al final del contenido">
-          {% if adsense_client and adsense_slot_inline_bottom %}
+          {% if adsense_client and adsense_slot_inline_top %}
           <ins class="adsbygoogle"
-               style="display:block"
-               data-ad-client="{{ adsense_client }}"
-               data-ad-slot="{{ adsense_slot_inline_bottom }}"
-               data-ad-format="auto"
-               data-full-width-responsive="true"></ins>
-          {% else %}
-          <div class="ad-slot-placeholder">Espacio publicitario</div>
+          style="display:block"
+          data-ad-client="{{ adsense_client }}"
+          data-ad-slot="{{ adsense_slot_inline_top }}"
+          data-ad-format="auto"
+          data-full-width-responsive="true"></ins>
+          <script>
+          (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
           {% endif %}
         </div>
       </div>
@@ -117,30 +119,19 @@
       <div class="ad-slot ad-slot-rail">
         {% if adsense_client and adsense_slot_rail_right %}
         <ins class="adsbygoogle"
-             style="display:block"
-             data-ad-client="{{ adsense_client }}"
-             data-ad-slot="{{ adsense_slot_rail_right }}"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
-        {% else %}
-        <div class="ad-slot-placeholder">Espacio publicitario</div>
+        style="display:block"
+        data-ad-client="{{ adsense_client }}"
+        data-ad-slot="{{ adsense_slot_rail_right }}"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+        <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
         {% endif %}
       </div>
     </aside>
   </div>
 </section>
-
-{% if adsense_client %}
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client }}" crossorigin="anonymous"></script>
-<script>
-  (function () {
-    var adUnits = document.querySelectorAll(".adsbygoogle");
-    for (var i = 0; i < adUnits.length; i += 1) {
-      (adsbygoogle = window.adsbygoogle || []).push({});
-    }
-  })();
-</script>
-{% endif %}
 
 <script>
   window.COUNTDOWN_TARGET_ISO = "{{ target_iso|escapejs }}";

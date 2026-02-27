@@ -46,6 +46,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'cambiodemando.context_processors.google_verification',
             ],
         },
     },
@@ -77,6 +78,9 @@ ADSENSE_SLOT_INLINE_TOP = os.environ.get('ADSENSE_SLOT_INLINE_TOP', '')
 ADSENSE_SLOT_INLINE_BOTTOM = os.environ.get('ADSENSE_SLOT_INLINE_BOTTOM', '')
 ADSENSE_SLOT_RAIL_LEFT = os.environ.get('ADSENSE_SLOT_RAIL_LEFT', '')
 ADSENSE_SLOT_RAIL_RIGHT = os.environ.get('ADSENSE_SLOT_RAIL_RIGHT', '')
+
+# Verificación de sitio en Google AdSense (meta tag; valor = content del meta google-site-verification)
+GOOGLE_SITE_VERIFICATION = os.environ.get('GOOGLE_SITE_VERIFICATION', '')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
