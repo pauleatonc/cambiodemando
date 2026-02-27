@@ -1,0 +1,133 @@
+/* Encuesta ¿Cómo vamos? */
+.poll-section {
+  max-width: 42rem;
+  margin: 2rem auto 3rem;
+  padding: 1rem;
+  font-family: inherit;
+}
+
+.poll-section h2 {
+  font-size: clamp(1.1rem, 3vw, 1.25rem);
+  font-weight: 600;
+  margin: 0 0 1rem;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.poll-form {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.poll-form button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s, background 0.2s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.poll-form button[name="option"][value="good"]:hover {
+  border-color: #28a745;
+  background: #f0fff4;
+}
+
+.poll-form button[name="option"][value="bad"]:hover {
+  border-color: #dc3545;
+  background: #fff5f5;
+}
+
+/* Gráfico en arco */
+.poll-result {
+  text-align: center;
+}
+
+.poll-arc-wrap {
+  display: inline-block;
+  position: relative;
+  margin-bottom: 1rem;
+}
+
+.poll-arc-svg {
+  display: block;
+  transform: rotate(-90deg);
+  max-width: 100%;
+  height: auto;
+}
+
+.poll-arc-percent {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: clamp(1.2rem, 4vw, 1.5rem);
+  font-weight: 700;
+  color: #1a1a1a;
+  pointer-events: none;
+}
+
+.poll-arc-legend {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  flex-wrap: wrap;
+}
+
+.poll-arc-legend span {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.poll-arc-legend .dot-good {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #28a745;
+  flex-shrink: 0;
+}
+
+.poll-arc-legend .dot-bad {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #dc3545;
+  flex-shrink: 0;
+}
+
+.poll-result-label {
+  font-size: clamp(1rem, 2.5vw, 1.125rem);
+  font-weight: 600;
+  color: #333;
+  padding: 0.5rem 1rem;
+  background: #fff;
+  border-radius: 8px;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 480px) {
+  .poll-section {
+    padding: 0.75rem;
+    margin-top: 1.5rem;
+  }
+  .poll-form {
+    flex-direction: column;
+  }
+  .poll-form button {
+    width: 100%;
+  }
+  .poll-arc-svg {
+    width: 180px;
+    height: 180px;
+  }
+}

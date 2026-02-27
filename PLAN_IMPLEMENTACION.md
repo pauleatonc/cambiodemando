@@ -241,15 +241,15 @@ cambiodemando/
 - [x] **6** Crear Dockerfile y docker-compose.yml (dev) con Postgres y `DJANGO_SETTINGS_MODULE=...dev`.
 - [x] **7** Crear docker-compose-prod.yml con `DJANGO_SETTINGS_MODULE=...prod`.
 - [x] **8** Documentar o automatizar migraciones y arranque (dev y prod).
-- [ ] **9** Implementar modelo `Vote` en `applications/poll`, migraciones.
+- [x] **9** Implementar modelo `Vote` en `applications/poll`, migraciones.
 - [x] **10** Implementar vista principal del countdown (imagen, título, texto, contador).
 - [x] **11** Implementar template del countdown y JS del contador (días, horas, minutos, segundos).
-- [ ] **12** Implementar vistas de la encuesta: POST voto, vista/API resultado.
-- [ ] **13** Implementar lógica de escala (20%) y texto de resultado.
-- [ ] **14** Integrar encuesta en la misma página: botón “Encuesta”, formulario Bien/Mal, uso de sesión para “ya votó”.
-- [ ] **15** Implementar gráfico en arco (Chart.js o SVG) con porcentajes y texto de resultado debajo.
-- [ ] **16** Ajustar estilos y assets (imagen, responsividad).
-- [ ] **17** Probar en Docker (dev) y validar prod (compose-prod).
+- [x] **12** Implementar vistas de la encuesta: POST voto, vista/API resultado.
+- [x] **13** Implementar lógica de escala (20%) y texto de resultado.
+- [x] **14** Integrar encuesta en la misma página: botón “Encuesta”, formulario Bien/Mal, uso de sesión para “ya votó”.
+- [x] **15** Implementar gráfico en arco (Chart.js o SVG) con porcentajes y texto de resultado debajo.
+- [x] **16** Ajustar estilos y assets (imagen, responsividad).
+- [x] **17** Probar en Docker (dev) y validar prod (compose-prod).
 
 ---
 

@@ -5,5 +5,6 @@ from . import views
 app_name = 'poll'
 
 urlpatterns = [
-    # Rutas de encuesta (submit/, api/result/) se añadirán en Fase 4
+    path('submit/', views.vote_submit, name='submit'),
+    path('api/result/', views.api_result, name='api_result'),
 ]

@@ -3,8 +3,12 @@
 
 {% block title %}{{ title }}{% endblock %}
 
-{% block content %}
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'countdown/countdown.css' %}">
+<link rel="stylesheet" href="{% static 'poll/poll.css' %}">
+{% endblock %}
+
+{% block content %}
 <section class="countdown-section">
   <img
     class="countdown-hero"
@@ -34,6 +38,37 @@
       <span class="countdown-label">seg</span>
     </div>
   </div>
+</section>
+
+<section class="poll-section" aria-label="Encuesta">
+  <h2>¿Cómo vamos?</h2>
+  {% if not poll_has_voted %}
+  <form class="poll-form" method="post" action="{% url 'poll:submit' %}">
+    {% csrf_token %}
+    <button type="submit" name="option" value="good">Bien</button>
+    <button type="submit" name="option" value="bad">Mal</button>
+  </form>
+  {% else %}
+  <div class="poll-result">
+    <div class="poll-arc-wrap">
+      <svg class="poll-arc-svg" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#e9ecef" stroke-width="20"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#28a745" stroke-width="20"
+          stroke-dasharray="{{ poll_result.good_dash }} {{ poll_result.circumference }}"
+          stroke-dashoffset="{{ poll_result.offset_start }}"/>
+        <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="20"
+          stroke-dasharray="{{ poll_result.bad_dash }} {{ poll_result.circumference }}"
+          stroke-dashoffset="{{ poll_result.offset_red }}"/>
+      </svg>
+      <span class="poll-arc-percent" id="poll-arc-percent">{{ poll_result.good_pct_display }}%</span>
+    </div>
+    <div class="poll-arc-legend">
+      <span><i class="dot-good"></i> Bien {{ poll_result.good_pct_display }}%</span>
+      <span><i class="dot-bad"></i> Mal {{ poll_result.bad_pct_display }}%</span>
+    </div>
+    <p class="poll-result-label">{{ poll_result.result_label }}</p>
+  </div>
+  {% endif %}
 </section>
 
 <script>
