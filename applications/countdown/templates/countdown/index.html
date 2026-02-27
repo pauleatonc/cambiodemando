@@ -11,7 +11,7 @@
 {% block content %}
 <section class="countdown-section">
   <header class="countdown-header">
-    <h1 class="countdown-title">¿Cuánto falta para que se vaya?</h1>
+    <h1 class="countdown-title">¿Cuánto falta para que se vaya Kast?</h1>
   </header>
 
   <div class="countdown-layout">
@@ -62,12 +62,12 @@
             <circle cx="100" cy="100" r="80" fill="none" stroke="#e9ecef" stroke-width="20"/>
             {% if poll_result.good_dash > 0 %}
             <circle cx="100" cy="100" r="80" fill="none" stroke="#28a745" stroke-width="20"
-              stroke-dasharray="{% if poll_result.good_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.good_dash }} {{ poll_result.circumference }}{% endif %}"
+              stroke-dasharray="{% if poll_result.good_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.good_dash }} {{ poll_result.good_gap }}{% endif %}"
               stroke-dashoffset="{{ poll_result.offset_start }}"/>
             {% endif %}
             {% if poll_result.bad_dash > 0 %}
             <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="20"
-              stroke-dasharray="{% if poll_result.bad_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.bad_dash }} {{ poll_result.circumference }}{% endif %}"
+              stroke-dasharray="{% if poll_result.bad_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.bad_dash }} {{ poll_result.bad_gap }}{% endif %}"
               stroke-dashoffset="{% if poll_result.good_dash > 0 %}{{ poll_result.offset_red }}{% else %}{{ poll_result.offset_start }}{% endif %}"/>
             {% endif %}
           </svg>

@@ -6,10 +6,14 @@ from .constants import TARGET_DATE
 def index(request):
     """Vista principal: imagen, título, texto, contador y bloque de encuesta."""
     from applications.poll.services import get_poll_result
+    from applications.poll.views import has_voted_today
+
+    # Forzar que la sesión se guarde y se envíe la cookie (evita 403 CSRF al votar)
+    request.session.setdefault('_poll_visit', 1)
 
     target_iso = TARGET_DATE.isoformat()
     poll_result = get_poll_result()
-    poll_has_voted = request.session.get('poll_voted', False)
+    poll_has_voted = has_voted_today(request)
 
     return render(request, 'countdown/index.html', {
         'target_iso': target_iso,
