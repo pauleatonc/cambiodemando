@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import render
 
 from .constants import TARGET_DATE
@@ -21,4 +22,9 @@ def index(request):
         'description': 'Cuenta regresiva hasta el 11 de marzo de 2030 a las 12:00.',
         'poll_result': poll_result,
         'poll_has_voted': poll_has_voted,
+        'adsense_client': getattr(settings, 'ADSENSE_CLIENT', ''),
+        'adsense_slot_inline_top': getattr(settings, 'ADSENSE_SLOT_INLINE_TOP', ''),
+        'adsense_slot_inline_bottom': getattr(settings, 'ADSENSE_SLOT_INLINE_BOTTOM', ''),
+        'adsense_slot_rail_left': getattr(settings, 'ADSENSE_SLOT_RAIL_LEFT', ''),
+        'adsense_slot_rail_right': getattr(settings, 'ADSENSE_SLOT_RAIL_RIGHT', ''),
     })

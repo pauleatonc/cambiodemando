@@ -1,6 +1,6 @@
 /* Countdown section - diseño mínimo y responsive */
 .countdown-section {
-  max-width: 42rem;
+  max-width: 90rem;
   margin: 0 auto;
   padding: 2rem 1rem;
   text-align: center;
@@ -15,8 +15,13 @@
   margin: 0;
 }
 
-.countdown-layout {
-  /* En móvil los hijos se apilan en columna */
+.countdown-shell {
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.ad-rail {
+  display: none;
 }
 
 .countdown-content {
@@ -51,6 +56,34 @@
   color: #444;
   margin: 0 0 2rem;
   line-height: 1.5;
+}
+
+.ad-slot {
+  width: 100%;
+  margin: 1.25rem 0;
+}
+
+.ad-slot-inline {
+  max-width: 46rem;
+}
+
+.ad-slot-rail {
+  min-height: 600px;
+}
+
+.ad-slot-placeholder {
+  min-height: 120px;
+  border: 1px dashed #c8ccd0;
+  border-radius: 8px;
+  background: #fff;
+  color: #666;
+  font-size: 0.85rem;
+  display: grid;
+  place-items: center;
+}
+
+.ad-slot-rail .ad-slot-placeholder {
+  min-height: 600px;
 }
 
 .countdown {
@@ -88,8 +121,11 @@
 /* Tablet y PC: título arriba a todo ancho; debajo imagen izquierda y contenido derecha */
 @media (min-width: 768px) {
   .countdown-section {
-    max-width: 64rem;
     padding: 2rem;
+  }
+
+  .countdown-shell {
+    max-width: 64rem;
   }
 
   .countdown-header {
@@ -125,6 +161,26 @@
 
   .countdown {
     justify-content: center;
+  }
+}
+
+@media (min-width: 1200px) {
+  .countdown-shell {
+    max-width: 86rem;
+    display: grid;
+    grid-template-columns: minmax(160px, 1fr) minmax(0, 64rem) minmax(160px, 1fr);
+    gap: 1.25rem;
+    align-items: start;
+  }
+
+  .countdown-layout {
+    grid-column: 2;
+  }
+
+  .ad-rail {
+    display: block;
+    position: sticky;
+    top: 1rem;
   }
 }
 

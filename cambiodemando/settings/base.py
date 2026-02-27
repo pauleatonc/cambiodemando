@@ -5,6 +5,7 @@ Common configuration shared by all environments.
 SECRET_KEY, DEBUG, ALLOWED_HOSTS and DATABASES are defined per environment.
 """
 
+import os
 from pathlib import Path
 
 # Build paths: settings/base.py -> settings/ -> cambiodemando/ -> project root
@@ -69,6 +70,13 @@ USE_TZ = True
 # Static files
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
+
+# AdSense
+ADSENSE_CLIENT = os.environ.get('ADSENSE_CLIENT', '')
+ADSENSE_SLOT_INLINE_TOP = os.environ.get('ADSENSE_SLOT_INLINE_TOP', '')
+ADSENSE_SLOT_INLINE_BOTTOM = os.environ.get('ADSENSE_SLOT_INLINE_BOTTOM', '')
+ADSENSE_SLOT_RAIL_LEFT = os.environ.get('ADSENSE_SLOT_RAIL_LEFT', '')
+ADSENSE_SLOT_RAIL_RIGHT = os.environ.get('ADSENSE_SLOT_RAIL_RIGHT', '')
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -14,76 +14,133 @@
     <h1 class="countdown-title">¿Cuánto falta para que se vaya Kast?</h1>
   </header>
 
-  <div class="countdown-layout">
-    <img
-      class="countdown-hero"
-      src="{% static 'img/kastfull.jpg' %}"
-      alt="Cambio de mando"
-    />
-    <div class="countdown-content">
-      <p class="countdown-description">{{ description }}</p>
+  <div class="countdown-shell">
+    <aside class="ad-rail ad-rail-left" aria-label="Publicidad lateral izquierda">
+      <div class="ad-slot ad-slot-rail">
+        {% if adsense_client and adsense_slot_rail_left %}
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="{{ adsense_client }}"
+             data-ad-slot="{{ adsense_slot_rail_left }}"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        {% else %}
+        <div class="ad-slot-placeholder">Espacio publicitario</div>
+        {% endif %}
+      </div>
+    </aside>
 
-      <div class="countdown" id="countdown" role="timer" aria-live="polite">
-      <div class="countdown-item">
-        <span class="countdown-value" id="countdown-days">--</span>
-        <span class="countdown-label">días</span>
-      </div>
-      <div class="countdown-item">
-        <span class="countdown-value" id="countdown-hours">--</span>
-        <span class="countdown-label">horas</span>
-      </div>
-      <div class="countdown-item">
-        <span class="countdown-value" id="countdown-minutes">--</span>
-        <span class="countdown-label">min</span>
-      </div>
-      <div class="countdown-item">
-        <span class="countdown-value" id="countdown-seconds">--</span>
-        <span class="countdown-label">seg</span>
+    <div class="countdown-layout">
+      <img
+        class="countdown-hero"
+        src="{% static 'img/kastfull.jpg' %}"
+        alt="Cambio de mando"
+      />
+      <div class="countdown-content">
+        <p class="countdown-description">{{ description }}</p>
+
+        <div class="countdown" id="countdown" role="timer" aria-live="polite">
+          <div class="countdown-item">
+            <span class="countdown-value" id="countdown-days">--</span>
+            <span class="countdown-label">días</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-value" id="countdown-hours">--</span>
+            <span class="countdown-label">horas</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-value" id="countdown-minutes">--</span>
+            <span class="countdown-label">min</span>
+          </div>
+          <div class="countdown-item">
+            <span class="countdown-value" id="countdown-seconds">--</span>
+            <span class="countdown-label">seg</span>
+          </div>
+        </div>
+
+        <section class="poll-section" aria-label="Encuesta">
+          <h2>¿Cómo vamos?</h2>
+          {% if not poll_has_voted %}
+          <form class="poll-form" method="post" action="{% url 'poll:submit' %}">
+            {% csrf_token %}
+            <button type="submit" name="option" value="good" class="poll-btn poll-btn-good" title="Bien" aria-label="Bien">
+              <svg class="poll-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+            </button>
+            <button type="submit" name="option" value="bad" class="poll-btn poll-btn-bad" title="Mal" aria-label="Mal">
+              <svg class="poll-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+            </button>
+          </form>
+          {% else %}
+          <div class="poll-result">
+            <p class="poll-result-label poll-result-label-first">{{ poll_result.result_label }}</p>
+            <div class="poll-arc-wrap">
+              <svg class="poll-arc-svg" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#e9ecef" stroke-width="20"/>
+                {% if poll_result.good_dash > 0 %}
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#28a745" stroke-width="20"
+                  stroke-dasharray="{% if poll_result.good_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.good_dash }} {{ poll_result.good_gap }}{% endif %}"
+                  stroke-dashoffset="{{ poll_result.offset_start }}"/>
+                {% endif %}
+                {% if poll_result.bad_dash > 0 %}
+                <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="20"
+                  stroke-dasharray="{% if poll_result.bad_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.bad_dash }} {{ poll_result.bad_gap }}{% endif %}"
+                  stroke-dashoffset="{% if poll_result.good_dash > 0 %}{{ poll_result.offset_red }}{% else %}{{ poll_result.offset_start }}{% endif %}"/>
+                {% endif %}
+              </svg>
+              <span class="poll-arc-percent" id="poll-arc-percent">{{ poll_result.good_pct_display }}%</span>
+            </div>
+            <div class="poll-arc-legend">
+              <span class="poll-legend-item poll-legend-good"><svg class="poll-legend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Bien {{ poll_result.good_pct_display }}%</span>
+              <span class="poll-legend-item poll-legend-bad"><svg class="poll-legend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg> Mal {{ poll_result.bad_pct_display }}%</span>
+            </div>
+          </div>
+          {% endif %}
+          <p>Solo se puede votar una vez por día.</p>
+        </section>
+
+        <div class="ad-slot ad-slot-inline" aria-label="Publicidad al final del contenido">
+          {% if adsense_client and adsense_slot_inline_bottom %}
+          <ins class="adsbygoogle"
+               style="display:block"
+               data-ad-client="{{ adsense_client }}"
+               data-ad-slot="{{ adsense_slot_inline_bottom }}"
+               data-ad-format="auto"
+               data-full-width-responsive="true"></ins>
+          {% else %}
+          <div class="ad-slot-placeholder">Espacio publicitario</div>
+          {% endif %}
+        </div>
       </div>
     </div>
 
-    <section class="poll-section" aria-label="Encuesta">
-      <h2>¿Cómo vamos?</h2>
-      {% if not poll_has_voted %}
-      <form class="poll-form" method="post" action="{% url 'poll:submit' %}">
-        {% csrf_token %}
-        <button type="submit" name="option" value="good" class="poll-btn poll-btn-good" title="Bien" aria-label="Bien">
-          <svg class="poll-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
-        </button>
-        <button type="submit" name="option" value="bad" class="poll-btn poll-btn-bad" title="Mal" aria-label="Mal">
-          <svg class="poll-btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
-        </button>
-      </form>
-      {% else %}
-      <div class="poll-result">
-        <p class="poll-result-label poll-result-label-first">{{ poll_result.result_label }}</p>
-        <div class="poll-arc-wrap">
-          <svg class="poll-arc-svg" viewBox="0 0 200 200" width="200" height="200" aria-hidden="true">
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#e9ecef" stroke-width="20"/>
-            {% if poll_result.good_dash > 0 %}
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#28a745" stroke-width="20"
-              stroke-dasharray="{% if poll_result.good_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.good_dash }} {{ poll_result.good_gap }}{% endif %}"
-              stroke-dashoffset="{{ poll_result.offset_start }}"/>
-            {% endif %}
-            {% if poll_result.bad_dash > 0 %}
-            <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="20"
-              stroke-dasharray="{% if poll_result.bad_dash == poll_result.circumference %}502 0{% else %}{{ poll_result.bad_dash }} {{ poll_result.bad_gap }}{% endif %}"
-              stroke-dashoffset="{% if poll_result.good_dash > 0 %}{{ poll_result.offset_red }}{% else %}{{ poll_result.offset_start }}{% endif %}"/>
-            {% endif %}
-          </svg>
-          <span class="poll-arc-percent" id="poll-arc-percent">{{ poll_result.good_pct_display }}%</span>
-        </div>
-        <div class="poll-arc-legend">
-          <span class="poll-legend-item poll-legend-good"><svg class="poll-legend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> Bien {{ poll_result.good_pct_display }}%</span>
-          <span class="poll-legend-item poll-legend-bad"><svg class="poll-legend-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg> Mal {{ poll_result.bad_pct_display }}%</span>
-        </div>
+    <aside class="ad-rail ad-rail-right" aria-label="Publicidad lateral derecha">
+      <div class="ad-slot ad-slot-rail">
+        {% if adsense_client and adsense_slot_rail_right %}
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="{{ adsense_client }}"
+             data-ad-slot="{{ adsense_slot_rail_right }}"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        {% else %}
+        <div class="ad-slot-placeholder">Espacio publicitario</div>
+        {% endif %}
       </div>
-      {% endif %}
-      <p>Solo se puede votar una vez por día.</p>
-    </section>
-  </div>
+    </aside>
   </div>
 </section>
+
+{% if adsense_client %}
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client }}" crossorigin="anonymous"></script>
+<script>
+  (function () {
+    var adUnits = document.querySelectorAll(".adsbygoogle");
+    for (var i = 0; i < adUnits.length; i += 1) {
+      (adsbygoogle = window.adsbygoogle || []).push({});
+    }
+  })();
+</script>
+{% endif %}
 
 <script>
   window.COUNTDOWN_TARGET_ISO = "{{ target_iso|escapejs }}";
