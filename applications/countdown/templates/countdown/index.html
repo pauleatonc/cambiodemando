@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'countdown/countdown.css' %}">
+<section class="countdown-section">
+  <img
+    class="countdown-hero"
+    src="{% static 'countdown/hero.svg' %}"
+    alt="Cambio de mando"
+    width="800"
+    height="320"
+  />
+  <h1 class="countdown-title">{{ title }}</h1>
+  <p class="countdown-description">{{ description }}</p>
+
+  <div class="countdown" id="countdown" role="timer" aria-live="polite">
+    <div class="countdown-item">
+      <span class="countdown-value" id="countdown-days">--</span>
+      <span class="countdown-label">días</span>
+    </div>
+    <div class="countdown-item">
+      <span class="countdown-value" id="countdown-hours">--</span>
+      <span class="countdown-label">horas</span>
+    </div>
+    <div class="countdown-item">
+      <span class="countdown-value" id="countdown-minutes">--</span>
+      <span class="countdown-label">min</span>
+    </div>
+    <div class="countdown-item">
+      <span class="countdown-value" id="countdown-seconds">--</span>
+      <span class="countdown-label">seg</span>
+    </div>
+  </div>
+</section>
+
+<script>
+  window.COUNTDOWN_TARGET_ISO = "{{ target_iso|escapejs }}";
+</script>
+<script src="{% static 'countdown/countdown.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,35 @@
+# Git
+.git
+.gitignore
+
+# Python
+.venv
+venv
+__pycache__
+*.pyc
+*.pyo
+.pytest_cache
+.mypy_cache
+*.egg-info
+.eggs
+
+# Environment (secrets; compose inyecta desde .env en el host)
+.env
+.env.*
+
+# IDE y OS
+.idea
+.vscode
+*.swp
+*.swo
+.DS_Store
+
+# Django (no copiar DB ni archivos generados)
+db.sqlite3
+staticfiles
+media
+*.log
+
+# Docs y tests (opcional; descomenta si no quieres en imagen)
+# PLAN_IMPLEMENTACION.md
+# *.md
