@@ -7,11 +7,33 @@
   font-family: inherit;
 }
 
+.countdown-header {
+  margin-bottom: 1.5rem;
+}
+
+.countdown-header .countdown-title {
+  margin: 0;
+}
+
+.countdown-layout {
+  /* En móvil los hijos se apilan en columna */
+}
+
+.countdown-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdown-content .poll-section {
+  align-self: center;
+}
+
 .countdown-hero {
   width: 100%;
   height: auto;
-  max-height: 320px;
-  object-fit: cover;
+  max-height: 100%;
+  object-fit: contain;
   border-radius: 8px;
   margin-bottom: 1.5rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -61,6 +83,49 @@
   letter-spacing: 0.05em;
   color: #666;
   margin-top: 0.25rem;
+}
+
+/* Tablet y PC: título arriba a todo ancho; debajo imagen izquierda y contenido derecha */
+@media (min-width: 768px) {
+  .countdown-section {
+    max-width: 64rem;
+    padding: 2rem;
+  }
+
+  .countdown-header {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .countdown-layout {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 2rem;
+    text-align: left;
+  }
+
+  .countdown-hero {
+    flex: 0 0 45%;
+    max-width: 45%;
+    margin-bottom: 0;
+    align-self: stretch;
+    max-height: 80vh;
+    object-fit: cover;
+  }
+
+  .countdown-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .countdown {
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
