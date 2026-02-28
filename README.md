@@ -50,3 +50,41 @@ python manage.py runserver
 - `applications/countdown`: contador y página principal.
 - `applications/poll`: encuesta y modelo `Vote`.
 - `cambiodemando/settings/`: `base.py`, `local.py`, `dev.py`, `prod.py`.
+
+## Publicación diaria en Instagram
+
+Se implementó un flujo automático diario:
+- Genera una imagen JPG (1080x1350) con base `static/img/kastfull.jpg` + resultado de la encuesta.
+- Guarda artefacto y metadatos por fecha en `DailyPublication`.
+- Publica en Instagram vía Meta Graph API.
+
+### Variables de entorno nuevas
+
+- `SITE_BASE_URL`: URL pública de la app (ej. `https://cambiodemando.cl`).
+- `PUBLIC_MEDIA_BASE_URL`: base URL pública para servir los JPG diarios (si no está, usa `SITE_BASE_URL`).
+- `INSTAGRAM_BASE_URL`: endpoint base de Graph API (por defecto `https://graph.facebook.com/v22.0`).
+- `INSTAGRAM_ACCESS_TOKEN`: token de Instagram Graph API.
+- `INSTAGRAM_IG_USER_ID`: ID de usuario de Instagram Business/Creator.
+- `INSTAGRAM_CAPTION_TEMPLATE`: plantilla del caption.
+- `DAILY_POST_HOUR`: hora local de ejecución (por defecto `12`).
+- `DAILY_POST_MINUTE`: minuto local de ejecución (por defecto `0`).
+
+### Comandos de operación
+
+```bash
+# 1) Generar imagen del día
+python manage.py generate_daily_image
+
+# 2) Publicar imagen del día
+python manage.py publish_daily_instagram
+
+# 3) Ejecutar scheduler interno (loop diario)
+python manage.py run_daily_scheduler
+
+# 4) Probar flujo completo sin esperar al mediodía
+python manage.py run_daily_scheduler --run-once
+```
+
+### Docker producción
+
+`docker-compose-prod.yml` incluye ahora un servicio `scheduler` separado del `web`, para evitar duplicados por múltiples workers.

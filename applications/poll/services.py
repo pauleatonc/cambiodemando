@@ -3,6 +3,7 @@ Lógica de negocio de la encuesta.
 Escala 20%: resultado según % Bien/Mal sobre el total.
 """
 from django.db.models import Count
+from django.utils import timezone
 
 from .models import Vote
 
@@ -79,4 +80,26 @@ def get_poll_result():
         'offset_red': offset_red,
         'good_pct_display': int(round(good_pct * 100)),
         'bad_pct_display': int(round(bad_pct * 100)),
+    }
+
+
+def get_daily_poll_snapshot():
+    """Payload estable para composicion de imagen diaria y publicaciones."""
+    result = get_poll_result()
+    return {
+        'snapshot_date': timezone.localdate(),
+        'title': '¿Cómo vamos?',
+        'result_label': result['result_label'],
+        'good_count': result['good_count'],
+        'bad_count': result['bad_count'],
+        'total': result['total'],
+        'good_pct_display': result['good_pct_display'],
+        'bad_pct_display': result['bad_pct_display'],
+        'good_dash': result['good_dash'],
+        'bad_dash': result['bad_dash'],
+        'good_gap': result['good_gap'],
+        'bad_gap': result['bad_gap'],
+        'circumference': result['circumference'],
+        'offset_start': result['offset_start'],
+        'offset_red': result['offset_red'],
     }

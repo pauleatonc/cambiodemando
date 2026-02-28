@@ -71,6 +71,8 @@ USE_TZ = True
 # Static files
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else []
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # AdSense
 ADSENSE_CLIENT = os.environ.get('ADSENSE_CLIENT', '')
@@ -81,6 +83,19 @@ ADSENSE_SLOT_RAIL_RIGHT = os.environ.get('ADSENSE_SLOT_RAIL_RIGHT', '')
 
 # Verificación de sitio en Google AdSense (meta tag; valor = content del meta google-site-verification)
 GOOGLE_SITE_VERIFICATION = os.environ.get('GOOGLE_SITE_VERIFICATION', '')
+
+# Publicaciones diarias e Instagram
+SITE_BASE_URL = os.environ.get('SITE_BASE_URL', 'http://localhost:8000')
+PUBLIC_MEDIA_BASE_URL = os.environ.get('PUBLIC_MEDIA_BASE_URL', SITE_BASE_URL)
+INSTAGRAM_BASE_URL = os.environ.get('INSTAGRAM_BASE_URL', 'https://graph.facebook.com/v22.0')
+INSTAGRAM_ACCESS_TOKEN = os.environ.get('INSTAGRAM_ACCESS_TOKEN', '')
+INSTAGRAM_IG_USER_ID = os.environ.get('INSTAGRAM_IG_USER_ID', '')
+INSTAGRAM_CAPTION_TEMPLATE = os.environ.get(
+    'INSTAGRAM_CAPTION_TEMPLATE',
+    '¿Cómo vamos? Bien: {good_pct}% | Mal: {bad_pct}% | Resultado: {result_label}',
+)
+DAILY_POST_HOUR = int(os.environ.get('DAILY_POST_HOUR', '12'))
+DAILY_POST_MINUTE = int(os.environ.get('DAILY_POST_MINUTE', '0'))
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

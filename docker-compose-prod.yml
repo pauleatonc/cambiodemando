@@ -30,6 +30,27 @@ services:
       DB_HOST: db
     ports:
       - "8001:8000"
+    volumes:
+      - daily_media:/app/media
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - default
+      - mda_network_prod
+
+  scheduler:
+    build: .
+    container_name: cambiodemando_scheduler
+    command: >
+      sh -c "python manage.py migrate --noinput &&
+             python manage.py run_daily_scheduler"
+    env_file: .env
+    environment:
+      DJANGO_SETTINGS_MODULE: cambiodemando.settings.prod
+      DB_HOST: db
+    volumes:
+      - daily_media:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -39,6 +60,7 @@ services:
 
 volumes:
   pgdata_prod:
+  daily_media:
 
 networks:
   mda_network_prod:

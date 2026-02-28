@@ -1,0 +1,54 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1080, initial-scale=1.0">
+  <title>Tarjeta diaria</title>
+  {% if inline_css %}
+  <style>
+    {{ inline_css|safe }}
+  </style>
+  {% else %}
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'countdown/daily_card.css' %}">
+  {% endif %}
+</head>
+<body>
+  <main class="daily-card">
+    <img class="daily-card-bg" src="{{ card_image_data_uri }}" alt="Fondo principal">
+    <h1 class="daily-top-title">¿Cuánto falta para que se vaya?</h1>
+    <div class="daily-card-overlay">
+      <section class="daily-poll">
+        <div class="daily-days-card" aria-label="Días para el cambio de mando">
+          <p class="daily-days-value">{{ days_to_change }} DÍAS</p>
+          <p class="daily-days-label">para que se vaya Kast</p>
+        </div>
+        <h1 class="daily-title">{{ title }}</h1>
+        <p class="daily-result">{{ result_label }}</p>
+        <div class="daily-arc-wrap">
+          <svg class="daily-arc-svg" viewBox="0 0 200 200" width="240" height="240" aria-hidden="true">
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#e9ecef" stroke-width="40"/>
+            {% if good_dash > 0 %}
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#28a745" stroke-width="40"
+              stroke-dasharray="{% if good_dash == circumference %}502 0{% else %}{{ good_dash }} {{ good_gap }}{% endif %}"
+              stroke-dashoffset="{{ offset_start }}"/>
+            {% endif %}
+            {% if bad_dash > 0 %}
+            <circle cx="100" cy="100" r="80" fill="none" stroke="#dc3545" stroke-width="40"
+              stroke-dasharray="{% if bad_dash == circumference %}502 0{% else %}{{ bad_dash }} {{ bad_gap }}{% endif %}"
+              stroke-dashoffset="{% if good_dash > 0 %}{{ offset_red }}{% else %}{{ offset_start }}{% endif %}"/>
+            {% endif %}
+          </svg>
+        </div>
+        <div class="daily-legend">
+          <span class="daily-legend-item daily-legend-good">Bien {{ good_pct_display }}%</span>
+          <span class="daily-legend-item daily-legend-bad">Mal {{ bad_pct_display }}%</span>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

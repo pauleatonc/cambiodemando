@@ -22,3 +22,48 @@ class Vote(models.Model):
 
     def __str__(self):
         return f'{self.get_option_display()} ({self.created_at})'
+
+
+class DailyPublication(models.Model):
+    """Bitacora diaria para generacion/publicacion de la imagen de encuesta."""
+
+    STATUS_GENERATED = 'generated'
+    STATUS_PUBLISH_PENDING = 'publish_pending'
+    STATUS_PUBLISHED = 'published'
+    STATUS_FAILED = 'failed'
+    STATUS_CHOICES = [
+        (STATUS_GENERATED, 'Generated'),
+        (STATUS_PUBLISH_PENDING, 'Publish pending'),
+        (STATUS_PUBLISHED, 'Published'),
+        (STATUS_FAILED, 'Failed'),
+    ]
+
+    publication_date = models.DateField(unique=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_GENERATED)
+
+    image_path = models.CharField(max_length=500, blank=True)
+    public_image_url = models.URLField(max_length=500, blank=True)
+
+    result_label = models.CharField(max_length=120, blank=True)
+    good_count = models.PositiveIntegerField(default=0)
+    bad_count = models.PositiveIntegerField(default=0)
+    total = models.PositiveIntegerField(default=0)
+    good_pct_display = models.PositiveSmallIntegerField(default=0)
+    bad_pct_display = models.PositiveSmallIntegerField(default=0)
+
+    creation_id = models.CharField(max_length=100, blank=True)
+    instagram_media_id = models.CharField(max_length=100, blank=True)
+    last_error = models.TextField(blank=True)
+
+    generated_at = models.DateTimeField(blank=True, null=True)
+    published_at = models.DateTimeField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-publication_date']
+        verbose_name = 'publicacion diaria'
+        verbose_name_plural = 'Publicaciones diarias'
+
+    def __str__(self):
+        return f'{self.publication_date} - {self.status}'
