@@ -5,7 +5,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.utils import timezone
 
 from applications.poll.models import DailyPublication
-from applications.poll.publication import InstagramPublisher
+from applications.poll.publication import InstagramPublisher, InstagramTokenManager
 
 
 class Command(BaseCommand):
@@ -37,10 +37,13 @@ class Command(BaseCommand):
             return
 
         publisher = InstagramPublisher()
+        token_manager = InstagramTokenManager()
         current_delay = retry_delay
         last_exc = None
         for attempt in range(1, retries + 1):
             try:
+                if attempt == 1:
+                    token_manager.refresh_if_needed()
                 publication = publisher.publish(publication)
                 self.stdout.write(
                     self.style.SUCCESS(
@@ -50,6 +53,13 @@ class Command(BaseCommand):
                 return
             except Exception as exc:  # noqa: BLE001 - comando CLI
                 last_exc = exc
+                # Si el error de auth aparece en primer intento, forzar refresh y reintentar.
+                if attempt == 1 and ('OAuth' in str(exc) or 'access token' in str(exc).lower()):
+                    try:
+                        token_manager.refresh_token()
+                        self.stdout.write(self.style.WARNING('Se detecto fallo de token. Token refrescado, reintentando.'))
+                    except Exception as refresh_exc:  # noqa: BLE001
+                        self.stdout.write(self.style.WARNING(f'No se pudo refrescar token automaticamente: {refresh_exc}'))
                 if attempt < retries:
                     self.stdout.write(
                         self.style.WARNING(

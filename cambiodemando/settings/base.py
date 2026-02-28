@@ -90,6 +90,10 @@ PUBLIC_MEDIA_BASE_URL = os.environ.get('PUBLIC_MEDIA_BASE_URL', SITE_BASE_URL)
 INSTAGRAM_BASE_URL = os.environ.get('INSTAGRAM_BASE_URL', 'https://graph.facebook.com/v22.0')
 INSTAGRAM_ACCESS_TOKEN = os.environ.get('INSTAGRAM_ACCESS_TOKEN', '')
 INSTAGRAM_IG_USER_ID = os.environ.get('INSTAGRAM_IG_USER_ID', '')
+INSTAGRAM_APP_ID = os.environ.get('INSTAGRAM_APP_ID', '')
+INSTAGRAM_APP_SECRET = os.environ.get('INSTAGRAM_APP_SECRET', '')
+INSTAGRAM_REFRESH_MODE = os.environ.get('INSTAGRAM_REFRESH_MODE', 'facebook_exchange')
+INSTAGRAM_REFRESH_THRESHOLD_DAYS = int(os.environ.get('INSTAGRAM_REFRESH_THRESHOLD_DAYS', '7'))
 INSTAGRAM_CAPTION_TEMPLATE = os.environ.get(
     'INSTAGRAM_CAPTION_TEMPLATE',
     '¿Cómo vamos? Bien: {good_pct}% | Mal: {bad_pct}% | Resultado: {result_label}',

@@ -1,11 +1,12 @@
+from datetime import timedelta
 from pathlib import Path
 from unittest.mock import patch
 
 from django.test import TestCase, override_settings
 from django.utils import timezone
 
-from applications.poll.models import DailyPublication, Vote
-from applications.poll.publication import DailyCardGenerator, InstagramPublisher
+from applications.poll.models import DailyPublication, InstagramTokenState, Vote
+from applications.poll.publication import DailyCardGenerator, InstagramPublisher, InstagramTokenManager
 from applications.poll.services import get_daily_poll_snapshot
 
 
@@ -89,3 +90,42 @@ class InstagramPublisherTests(TestCase):
         )
         with self.assertRaises(RuntimeError):
             InstagramPublisher().publish(publication)
+
+
+class InstagramTokenManagerTests(TestCase):
+    @override_settings(
+        INSTAGRAM_ACCESS_TOKEN='env-token',
+        INSTAGRAM_APP_ID='123',
+        INSTAGRAM_APP_SECRET='abc',
+        INSTAGRAM_REFRESH_MODE='facebook_exchange',
+    )
+    @patch('applications.poll.publication.InstagramTokenManager._http_get_json')
+    def test_refresh_token_updates_state(self, http_get_json_mock):
+        http_get_json_mock.return_value = {'access_token': 'new-token', 'expires_in': 3600}
+        manager = InstagramTokenManager()
+
+        token, _expires_at = manager.refresh_token()
+
+        self.assertEqual(token, 'new-token')
+        state = InstagramTokenState.objects.first()
+        self.assertIsNotNone(state)
+        self.assertEqual(state.access_token, 'new-token')
+
+    @override_settings(
+        INSTAGRAM_ACCESS_TOKEN='env-token',
+        INSTAGRAM_APP_ID='123',
+        INSTAGRAM_APP_SECRET='abc',
+        INSTAGRAM_REFRESH_THRESHOLD_DAYS=7,
+    )
+    @patch('applications.poll.publication.InstagramTokenManager.refresh_token')
+    def test_refresh_if_needed_when_expiring_soon(self, refresh_token_mock):
+        refresh_token_mock.return_value = ('refreshed', timezone.now())
+        InstagramTokenState.objects.create(
+            access_token='stored-token',
+            expires_at=timezone.now() + timedelta(days=2),
+        )
+        manager = InstagramTokenManager()
+
+        manager.refresh_if_needed()
+
+        refresh_token_mock.assert_called_once()

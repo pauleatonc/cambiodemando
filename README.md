@@ -65,6 +65,10 @@ Se implementó un flujo automático diario:
 - `INSTAGRAM_BASE_URL`: endpoint base de Graph API (por defecto `https://graph.facebook.com/v22.0`).
 - `INSTAGRAM_ACCESS_TOKEN`: token de Instagram Graph API.
 - `INSTAGRAM_IG_USER_ID`: ID de usuario de Instagram Business/Creator.
+- `INSTAGRAM_APP_ID`: app id de Meta (requerido para inspección/refresh en Graph API).
+- `INSTAGRAM_APP_SECRET`: app secret de Meta.
+- `INSTAGRAM_REFRESH_MODE`: `facebook_exchange` (recomendado para cuenta profesional), `instagram_refresh` o `disabled`.
+- `INSTAGRAM_REFRESH_THRESHOLD_DAYS`: umbral para refrescar antes de expirar.
 - `INSTAGRAM_CAPTION_TEMPLATE`: plantilla del caption.
 - `DAILY_POST_HOUR`: hora local de ejecución (por defecto `12`).
 - `DAILY_POST_MINUTE`: minuto local de ejecución (por defecto `0`).
@@ -77,6 +81,10 @@ python manage.py generate_daily_image
 
 # 2) Publicar imagen del día
 python manage.py publish_daily_instagram
+
+# 2.1) Inspeccionar / refrescar token manualmente
+python manage.py refresh_instagram_token
+python manage.py refresh_instagram_token --force
 
 # 3) Ejecutar scheduler interno (loop diario)
 python manage.py run_daily_scheduler

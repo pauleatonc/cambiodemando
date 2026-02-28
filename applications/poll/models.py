@@ -67,3 +67,31 @@ class DailyPublication(models.Model):
 
     def __str__(self):
         return f'{self.publication_date} - {self.status}'
+
+
+class InstagramTokenState(models.Model):
+    """Estado del access token de Meta usado para publicar en Instagram."""
+
+    provider_facebook = 'facebook_graph'
+    provider_instagram = 'instagram_graph'
+    PROVIDER_CHOICES = [
+        (provider_facebook, 'Facebook Graph'),
+        (provider_instagram, 'Instagram Graph'),
+    ]
+
+    provider = models.CharField(max_length=20, choices=PROVIDER_CHOICES, default=provider_facebook)
+    access_token = models.TextField(blank=True)
+    expires_at = models.DateTimeField(blank=True, null=True)
+    data_access_expires_at = models.DateTimeField(blank=True, null=True)
+    refreshed_at = models.DateTimeField(blank=True, null=True)
+    token_type = models.CharField(max_length=40, blank=True)
+    last_error = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'estado token instagram'
+        verbose_name_plural = 'Estados token instagram'
+
+    def __str__(self):
+        return f'{self.provider} - {"set" if self.access_token else "missing"}'

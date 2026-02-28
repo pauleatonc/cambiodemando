@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import DailyPublication, Vote
+from .models import DailyPublication, InstagramTokenState, Vote
 
 
 @admin.register(Vote)
@@ -22,3 +22,9 @@ class DailyPublicationAdmin(admin.ModelAdmin):
     )
     list_filter = ('status',)
     search_fields = ('publication_date', 'result_label', 'instagram_media_id')
+
+
+@admin.register(InstagramTokenState)
+class InstagramTokenStateAdmin(admin.ModelAdmin):
+    list_display = ('provider', 'expires_at', 'data_access_expires_at', 'refreshed_at', 'updated_at')
+    readonly_fields = ('created_at', 'updated_at')
