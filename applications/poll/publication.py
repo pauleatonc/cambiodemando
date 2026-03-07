@@ -1,4 +1,5 @@
 import json
+import base64
 from datetime import datetime, timedelta
 from pathlib import Path
 from urllib import error, parse, request
@@ -184,6 +185,8 @@ class XPublisher:
     UPLOAD_URL = 'https://upload.twitter.com/1.1/media/upload.json'
     UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'
     MAX_STATUS_LENGTH = 280
+    # User-Agent explícito: algunos proxies (p. ej. Cloudflare) pueden rechazar peticiones con "python-requests"
+    REQUEST_HEADERS = {'User-Agent': 'cambiodemando/1.0 (+https://cambiodemando.com)'}
 
     # Mismo contenido que caption de Instagram; se trunca a 280 caracteres.
     DEFAULT_STATUS_TEMPLATE = (
@@ -192,11 +195,12 @@ class XPublisher:
         'El sitio en la bio. Hoy: Bien {good_pct}% | Mal {bad_pct}% — {result_label}'
     )
 
-    def __init__(self):
+    def __init__(self, debug=False):
         self.consumer_key = getattr(settings, 'X_CONSUMER_KEY', '') or ''
         self.consumer_secret = getattr(settings, 'X_CONSUMER_SECRET', '') or ''
         self.access_token = getattr(settings, 'X_ACCESS_TOKEN', '') or ''
         self.access_token_secret = getattr(settings, 'X_ACCESS_TOKEN_SECRET', '') or ''
+        self.debug = debug
 
     def _has_credentials(self):
         return bool(
@@ -234,6 +238,99 @@ class XPublisher:
             return None
         return path
 
+    def _upload_media_chunked(self, image_path, auth):
+        """
+        Upload por chunks (INIT → APPEND → FINALIZE). INIT y FINALIZE son
+        application/x-www-form-urlencoded, así la firma OAuth es correcta.
+        APPEND se intenta con media_data en base64 (form-urlencoded) para evitar multipart.
+        """
+        data = image_path.read_bytes()
+        size = len(data)
+        if size > 5 * 1024 * 1024:  # 5 MB
+            raise RuntimeError('Imagen mayor a 5 MB; no soportado por chunked simple.')
+
+        # INIT (form-urlencoded)
+        init_data = {'command': 'INIT', 'total_bytes': size, 'media_type': 'image/jpeg'}
+        resp = requests.post(
+            self.UPLOAD_URL,
+            auth=auth,
+            data=init_data,
+            headers=self.REQUEST_HEADERS,
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            self._raise_upload_error(resp, 'INIT')
+        init_json = resp.json()
+        media_id = init_json.get('media_id_string') or init_json.get('media_id')
+        if not media_id:
+            raise RuntimeError(f'X INIT response invalid: {init_json}')
+
+        # APPEND: intentar form-urlencoded con media_data en base64 (evita multipart)
+        append_data = {
+            'command': 'APPEND',
+            'media_id': media_id,
+            'segment_index': 0,
+            'media_data': base64.b64encode(data).decode('ascii'),
+        }
+        resp = requests.post(
+            self.UPLOAD_URL,
+            auth=auth,
+            data=append_data,
+            headers=self.REQUEST_HEADERS,
+            timeout=30,
+        )
+        if resp.status_code not in (200, 204):
+            self._raise_upload_error(resp, 'APPEND')
+
+        # FINALIZE (form-urlencoded)
+        finalize_data = {'command': 'FINALIZE', 'media_id': media_id}
+        resp = requests.post(
+            self.UPLOAD_URL,
+            auth=auth,
+            data=finalize_data,
+            headers=self.REQUEST_HEADERS,
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            self._raise_upload_error(resp, 'FINALIZE')
+        final_json = resp.json()
+        media_id = final_json.get('media_id_string') or final_json.get('media_id')
+        if not media_id:
+            raise RuntimeError(f'X FINALIZE response invalid: {final_json}')
+        return media_id
+
+    def _raise_upload_error(self, resp, step):
+        if getattr(self, 'debug', False):
+            self._log_response(resp, f'media upload {step}')
+        err_detail = (resp.text or '(empty response body)').strip()
+        try:
+            err_json = resp.json()
+            if isinstance(err_json.get('errors'), list) and err_json['errors']:
+                err_detail = err_json['errors'][0].get('message', err_detail)
+        except Exception:
+            pass
+        if not resp.text:
+            err_detail += ' [Headers: ' + ', '.join(f'{k}={v}' for k, v in list(resp.headers.items())[:12]) + ']'
+        if len(err_detail) > 600:
+            err_detail = err_detail[:600] + '...'
+        raise RuntimeError(f'X media upload failed ({step}): {resp.status_code} {err_detail}')
+
+    def _log_response(self, resp, step):
+        """Imprime en stdout la respuesta completa de X para depuración (--debug)."""
+        import sys
+        body = (resp.text[:2000] + '...') if resp.text and len(resp.text) > 2000 else (resp.text or '(empty)')
+        lines = [
+            '--- X API response (debug) ---',
+            f'Step: {step}',
+            f'URL: {resp.url}',
+            f'Status: {resp.status_code}',
+            'Headers:',
+            *[f'  {k}: {v}' for k, v in resp.headers.items()],
+            f'Body: {body}',
+            '---',
+        ]
+        print('\n'.join(lines), file=sys.stderr, flush=True)
+
     def publish(self, publication):
         if publication.x_tweet_id:
             return publication
@@ -245,20 +342,7 @@ class XPublisher:
 
         auth = self._oauth1()
 
-        with open(image_path, 'rb') as f:
-            files = {'media': (image_path.name, f, 'image/jpeg')}
-            resp = requests.post(
-                self.UPLOAD_URL,
-                auth=auth,
-                files=files,
-                timeout=30,
-            )
-        if resp.status_code != 200:
-            raise RuntimeError(f'X media upload failed: {resp.status_code} {resp.text}')
-        data = resp.json()
-        media_id = data.get('media_id_string') or data.get('media_id')
-        if not media_id:
-            raise RuntimeError(f'X media upload response invalid: {data}')
+        media_id = self._upload_media_chunked(image_path, auth)
 
         status_text = self._status_text(publication)
         payload = {'status': status_text, 'media_ids': str(media_id)}
@@ -266,10 +350,24 @@ class XPublisher:
             self.UPDATE_URL,
             auth=auth,
             data=payload,
+            headers=self.REQUEST_HEADERS,
             timeout=30,
         )
         if resp.status_code != 200:
-            raise RuntimeError(f'X statuses/update failed: {resp.status_code} {resp.text}')
+            if getattr(self, 'debug', False):
+                self._log_response(resp, 'statuses/update')
+            err_detail = (resp.text or '(empty response body)').strip()
+            try:
+                err_json = resp.json()
+                if isinstance(err_json.get('errors'), list) and err_json['errors']:
+                    err_detail = err_json['errors'][0].get('message', err_detail)
+            except Exception:
+                pass
+            if not resp.text:
+                err_detail += ' [Headers: ' + ', '.join(f'{k}={v}' for k, v in list(resp.headers.items())[:12]) + ']'
+            if len(err_detail) > 600:
+                err_detail = err_detail[:600] + '...'
+            raise RuntimeError(f'X statuses/update failed: {resp.status_code} {err_detail}')
         tweet = resp.json()
         tweet_id = tweet.get('id_str') or str(tweet.get('id', ''))
         if not tweet_id:

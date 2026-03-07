@@ -15,6 +15,7 @@ class Command(BaseCommand):
         parser.add_argument('--date', dest='publication_date', help='Fecha objetivo YYYY-MM-DD')
         parser.add_argument('--retries', type=int, default=3, help='Cantidad de intentos ante fallo transitorio')
         parser.add_argument('--retry-delay', type=int, default=5, help='Segundos de espera inicial entre reintentos')
+        parser.add_argument('--debug', action='store_true', help='Imprimir respuesta completa de X en caso de error (headers + body)')
 
     def _parse_date(self, value):
         if not value:
@@ -28,8 +29,9 @@ class Command(BaseCommand):
         publication_date = self._parse_date(options['publication_date'])
         retries = max(1, options['retries'])
         retry_delay = max(1, options['retry_delay'])
+        debug = options.get('debug', False)
 
-        publisher = XPublisher()
+        publisher = XPublisher(debug=debug)
         if not publisher._has_credentials():
             self.stdout.write('Credenciales X no configuradas; omitiendo publicacion en X.')
             return
