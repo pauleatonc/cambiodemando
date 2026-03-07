@@ -10,18 +10,20 @@
 
 {% block content %}
 <section class="countdown-section">
-  <header class="countdown-header">
-    <h1 class="countdown-title">¿Cuánto falta para el cambio de mando?</h1>
-  </header>
+  <div class="countdown-hero-section">
+    <header class="countdown-header">
+      <h1 class="countdown-title">¿Cuánto falta para el cambio de mando?</h1>
+    </header>
 
-  <div class="countdown-shell">
-    <div class="countdown-layout">
+    <div class="countdown-hero-row">
       <img
         class="countdown-hero"
         src="{% static 'img/kastfull.jpg' %}"
         alt="Cambio de mando"
       />
-      <div class="countdown-content">
+    <div class="countdown-shell">
+      <div class="countdown-layout">
+        <div class="countdown-content">
         <p class="countdown-description">{{ description }}</p>
 
         <div class="countdown" id="countdown" role="timer" aria-live="polite">
@@ -122,7 +124,7 @@
         </div>
       </div>
     </div>
-
+    </div>
   </div>
 </section>
 

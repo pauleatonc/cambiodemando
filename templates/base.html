@@ -40,7 +40,12 @@
     <header class="site-header">
       <nav class="site-nav" aria-label="Navegación principal">
         <a href="{% url 'countdown:index' %}" class="site-logo">Cambio de Mando</a>
-        <ul class="nav-links">
+        <button type="button" class="nav-toggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="nav-menu" id="nav-toggle">
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+          <span class="nav-toggle-bar"></span>
+        </button>
+        <ul class="nav-links" id="nav-menu">
           <li><a href="{% url 'pages:about' %}">Acerca de</a></li>
           <li><a href="{% url 'pages:contact' %}">Contacto</a></li>
         </ul>
@@ -74,5 +79,25 @@
       </nav>
       <p class="footer-copy">&copy; {{ current_year }} Cambio de Mando</p>
     </footer>
+    <script>
+      (function () {
+        var toggle = document.getElementById('nav-toggle');
+        var menu = document.getElementById('nav-menu');
+        if (!toggle || !menu) return;
+        toggle.addEventListener('click', function () {
+          var open = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', !open);
+          toggle.setAttribute('aria-label', open ? 'Abrir menú' : 'Cerrar menú');
+          document.body.classList.toggle('nav-open', !open);
+        });
+        menu.querySelectorAll('a').forEach(function (a) {
+          a.addEventListener('click', function () {
+            toggle.setAttribute('aria-expanded', 'false');
+            toggle.setAttribute('aria-label', 'Abrir menú');
+            document.body.classList.remove('nav-open');
+          });
+        });
+      })();
+    </script>
 </body>
 </html>
