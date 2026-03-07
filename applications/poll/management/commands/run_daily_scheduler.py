@@ -35,6 +35,7 @@ class Command(BaseCommand):
         call_command('refresh_instagram_token')
         call_command('generate_daily_image', date=current_date)
         call_command('publish_daily_instagram', date=current_date)
+        call_command('publish_daily_x', date=current_date)
         self.stdout.write(f'[{datetime.now().isoformat()}] Flujo diario finalizado')
 
     def handle(self, *args, **options):

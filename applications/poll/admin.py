@@ -19,9 +19,11 @@ class DailyPublicationAdmin(admin.ModelAdmin):
         'bad_pct_display',
         'generated_at',
         'published_at',
+        'x_tweet_id',
+        'x_published_at',
     )
     list_filter = ('status',)
-    search_fields = ('publication_date', 'result_label', 'instagram_media_id')
+    search_fields = ('publication_date', 'result_label', 'instagram_media_id', 'x_tweet_id')
 
 
 @admin.register(InstagramTokenState)

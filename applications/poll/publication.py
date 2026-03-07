@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from urllib import error, parse, request
 
+import requests
+from requests_oauthlib import OAuth1
+
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -172,6 +175,109 @@ class InstagramPublisher:
         publication.published_at = timezone.now()
         publication.last_error = ''
         publication.save()
+        return publication
+
+
+class XPublisher:
+    """Publica la imagen diaria en X (Twitter) con API v1.1 (OAuth 1.0a)."""
+
+    UPLOAD_URL = 'https://upload.twitter.com/1.1/media/upload.json'
+    UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'
+    MAX_STATUS_LENGTH = 280
+
+    # Mismo contenido que caption de Instagram; se trunca a 280 caracteres.
+    DEFAULT_STATUS_TEMPLATE = (
+        '¿Cómo vamos? Guste o no, a nuestro presidente le quedan {dias} días en ejercicio. '
+        'Participa en nuestra encuesta y cuéntanos tu opinión sobre su gestión. '
+        'El sitio en la bio. Hoy: Bien {good_pct}% | Mal {bad_pct}% — {result_label}'
+    )
+
+    def __init__(self):
+        self.consumer_key = getattr(settings, 'X_CONSUMER_KEY', '') or ''
+        self.consumer_secret = getattr(settings, 'X_CONSUMER_SECRET', '') or ''
+        self.access_token = getattr(settings, 'X_ACCESS_TOKEN', '') or ''
+        self.access_token_secret = getattr(settings, 'X_ACCESS_TOKEN_SECRET', '') or ''
+
+    def _has_credentials(self):
+        return bool(
+            self.consumer_key and self.consumer_secret
+            and self.access_token and self.access_token_secret
+        )
+
+    def _oauth1(self):
+        return OAuth1(
+            self.consumer_key,
+            client_secret=self.consumer_secret,
+            resource_owner_key=self.access_token,
+            resource_owner_secret=self.access_token_secret,
+        )
+
+    def _status_text(self, publication):
+        template = getattr(settings, 'X_STATUS_TEMPLATE', None) or self.DEFAULT_STATUS_TEMPLATE
+        days_left = (TARGET_DATE.date() - publication.publication_date).days
+        dias = max(0, days_left)
+        text = template.format(
+            dias=dias,
+            good_pct=publication.good_pct_display,
+            bad_pct=publication.bad_pct_display,
+            result_label=publication.result_label,
+        )
+        if len(text) > self.MAX_STATUS_LENGTH:
+            return text[: self.MAX_STATUS_LENGTH - 3] + '...'
+        return text
+
+    def _image_path(self, publication):
+        if not publication.image_path:
+            return None
+        path = Path(settings.BASE_DIR) / publication.image_path
+        if not path.is_file():
+            return None
+        return path
+
+    def publish(self, publication):
+        if publication.x_tweet_id:
+            return publication
+        if not self._has_credentials():
+            raise RuntimeError('Faltan credenciales X (X_CONSUMER_KEY, X_CONSUMER_SECRET, X_ACCESS_TOKEN, X_ACCESS_TOKEN_SECRET)')
+        image_path = self._image_path(publication)
+        if not image_path:
+            raise RuntimeError('La publicacion no tiene imagen en disco')
+
+        auth = self._oauth1()
+
+        with open(image_path, 'rb') as f:
+            files = {'media': (image_path.name, f, 'image/jpeg')}
+            resp = requests.post(
+                self.UPLOAD_URL,
+                auth=auth,
+                files=files,
+                timeout=30,
+            )
+        if resp.status_code != 200:
+            raise RuntimeError(f'X media upload failed: {resp.status_code} {resp.text}')
+        data = resp.json()
+        media_id = data.get('media_id_string') or data.get('media_id')
+        if not media_id:
+            raise RuntimeError(f'X media upload response invalid: {data}')
+
+        status_text = self._status_text(publication)
+        payload = {'status': status_text, 'media_ids': str(media_id)}
+        resp = requests.post(
+            self.UPDATE_URL,
+            auth=auth,
+            data=payload,
+            timeout=30,
+        )
+        if resp.status_code != 200:
+            raise RuntimeError(f'X statuses/update failed: {resp.status_code} {resp.text}')
+        tweet = resp.json()
+        tweet_id = tweet.get('id_str') or str(tweet.get('id', ''))
+        if not tweet_id:
+            raise RuntimeError(f'X statuses/update response invalid: {tweet}')
+
+        publication.x_tweet_id = tweet_id
+        publication.x_published_at = timezone.now()
+        publication.save(update_fields=['x_tweet_id', 'x_published_at', 'updated_at'])
         return publication
 
 

@@ -113,5 +113,14 @@ INSTAGRAM_CAPTION_TEMPLATE = os.environ.get(
 DAILY_POST_HOUR = int(os.environ.get('DAILY_POST_HOUR', '12'))
 DAILY_POST_MINUTE = int(os.environ.get('DAILY_POST_MINUTE', '0'))
 
+# X (Twitter) - OAuth 1.0a para publicar tweets con imagen
+# Consumer Key → X_CONSUMER_KEY, Consumer Secret → X_CONSUMER_SECRET
+# Access Token → X_ACCESS_TOKEN, Access Token Secret → X_ACCESS_TOKEN_SECRET
+X_CONSUMER_KEY = os.environ.get('X_CONSUMER_KEY', '')
+X_CONSUMER_SECRET = os.environ.get('X_CONSUMER_SECRET', '')
+X_ACCESS_TOKEN = os.environ.get('X_ACCESS_TOKEN', '')
+X_ACCESS_TOKEN_SECRET = os.environ.get('X_ACCESS_TOKEN_SECRET', '')
+X_BEARER_TOKEN = os.environ.get('X_BEARER_TOKEN', '')  # opcional
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

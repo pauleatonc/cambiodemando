@@ -53,6 +53,8 @@ class DailyPublication(models.Model):
 
     creation_id = models.CharField(max_length=100, blank=True)
     instagram_media_id = models.CharField(max_length=100, blank=True)
+    x_tweet_id = models.CharField(max_length=100, blank=True)
+    x_published_at = models.DateTimeField(blank=True, null=True)
     last_error = models.TextField(blank=True)
 
     generated_at = models.DateTimeField(blank=True, null=True)
