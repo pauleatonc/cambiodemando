@@ -10,6 +10,12 @@ DEBUG = False
 
 ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split(',') if os.environ.get('ALLOWED_HOSTS') else []
 
+# Orígenes HTTPS que el proxy (nginx) puede enviar; necesarios para que pase la verificación CSRF.
+if ALLOWED_HOSTS:
+    CSRF_TRUSTED_ORIGINS = [f'https://{h.strip()}' for h in ALLOWED_HOSTS if h.strip()]
+else:
+    CSRF_TRUSTED_ORIGINS = []
+
 SECRET_KEY = os.environ.get('SECRET_KEY')
 if not SECRET_KEY:
     raise ValueError('SECRET_KEY environment variable must be set in production')
