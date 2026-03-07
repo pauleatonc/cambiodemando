@@ -9,6 +9,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from applications.countdown.views import _get_daily_card_context
+from applications.countdown.constants import TARGET_DATE
 
 from .models import DailyPublication, InstagramTokenState
 
@@ -98,13 +99,14 @@ class DailyCardGenerator:
 class InstagramPublisher:
     """Publica una imagen diaria usando Meta Graph API (Instagram Business/Creator)."""
 
-    # Caption por defecto si INSTAGRAM_CAPTION_TEMPLATE no está definido
+    # Caption por defecto si INSTAGRAM_CAPTION_TEMPLATE no está definido.
+    # Placeholders: {dias}, {good_pct}, {bad_pct}, {result_label}
     DEFAULT_CAPTION = (
-        'Le guste o no, este es el tiempo que nos queda de este presidente. '
-        '¿Cómo vamos? Vote en nuestra encuesta diaria.\n\n'
-        'Bien: {good_pct}% | Mal: {bad_pct}% — {result_label}\n\n'
-        'Los votos son acumulativos y se puede votar una vez por día. '
-        'El sitio está en la bio.'
+        '¿Cómo vamos? Guste o no, a nuestro presidente le quedan {dias} días en ejercicio. '
+        'Participa en nuestra encuesta y cuéntanos tu opinión sobre su gestión.\n\n'
+        'El sitio en la bio.'
+        'Hoy: Bien {good_pct}% | Mal {bad_pct}% — {result_label}\n\n'
+        'Los votos son acumulativos y se puede votar una vez por día. '        
     )
 
     def __init__(self):
@@ -127,7 +129,10 @@ class InstagramPublisher:
 
     def _caption(self, publication):
         template = settings.INSTAGRAM_CAPTION_TEMPLATE or self.DEFAULT_CAPTION
+        days_left = (TARGET_DATE.date() - publication.publication_date).days
+        dias = max(0, days_left)
         return template.format(
+            dias=dias,
             good_pct=publication.good_pct_display,
             bad_pct=publication.bad_pct_display,
             result_label=publication.result_label,

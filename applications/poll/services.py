@@ -14,9 +14,9 @@ from .models import Vote
 RESULT_LABELS_BY_BAD_PCT = (
     (0.90, "Cerremos por fuera"),
     (0.80, "Como las weas"),
-    (0.70, "Chucha, me estoy preocupando"),
-    (0.60, "Se sabía igual..."),
-    (0.50, "Maomeno'nomá'"),
+    (0.70, "Pá preocuparse"),
+    (0.60, "Malena"),
+    (0.50, "Maomeno' nomá'"),
     (0.40, "Piola"),
     (0.30, "Buena perrooo..."),
     (0.20, "Amerita piscolits"),

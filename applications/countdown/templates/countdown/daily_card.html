@@ -5,6 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=1080, initial-scale=1.0">
   <title>Tarjeta diaria</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;800&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
   {% if inline_css %}
   <style>
     {{ inline_css|safe }}
@@ -12,14 +15,17 @@
   {% else %}
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;800&family=Libre+Baskerville:wght@400;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'countdown/daily_card.css' %}">
   {% endif %}
 </head>
 <body>
   <main class="daily-card">
     <img class="daily-card-bg" src="{{ card_image_data_uri }}" alt="Fondo principal">
-    <h1 class="daily-top-title">¿Cuánto falta para que se vaya?</h1>
+    <header class="daily-top-headline">
+      <p class="daily-top-kicker">CUENTA REGRESIVA</p>
+      <h1 class="daily-top-title">¿Cuánto le queda?</h1>
+    </header>
     <div class="daily-card-overlay">
       <section class="daily-poll">
         <div class="daily-days-card" aria-label="Días para el cambio de mando">
@@ -27,7 +33,6 @@
           <p class="daily-days-label">para que se vaya Kast</p>
         </div>
         <h1 class="daily-title">{{ title }}</h1>
-        <p class="daily-result">{{ result_label }}</p>
         <div class="daily-arc-wrap">
           <svg class="daily-arc-svg" viewBox="0 0 200 200" width="240" height="240" aria-hidden="true">
             <circle cx="100" cy="100" r="80" fill="none" stroke="#e9ecef" stroke-width="40"/>
@@ -47,6 +52,7 @@
           <span class="daily-legend-item daily-legend-good">Bien {{ good_pct_display }}%</span>
           <span class="daily-legend-item daily-legend-bad">Mal {{ bad_pct_display }}%</span>
         </div>
+        <p class="daily-result">{{ result_label }}</p>
       </section>
     </div>
   </main>
