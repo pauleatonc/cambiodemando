@@ -104,7 +104,7 @@ INSTAGRAM_REFRESH_MODE = os.environ.get('INSTAGRAM_REFRESH_MODE', 'facebook_exch
 INSTAGRAM_REFRESH_THRESHOLD_DAYS = int(os.environ.get('INSTAGRAM_REFRESH_THRESHOLD_DAYS', '7'))
 INSTAGRAM_CAPTION_TEMPLATE = os.environ.get(
     'INSTAGRAM_CAPTION_TEMPLATE',
-    '¿Cómo vamos? Bien: {good_pct}% | Mal: {bad_pct}% | Resultado: {result_label}',
+    '',  # Si está vacío se usa el default en applications.poll.publication
 )
 DAILY_POST_HOUR = int(os.environ.get('DAILY_POST_HOUR', '12'))
 DAILY_POST_MINUTE = int(os.environ.get('DAILY_POST_MINUTE', '0'))

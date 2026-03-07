@@ -69,7 +69,7 @@ Se implementó un flujo automático diario:
 - `INSTAGRAM_APP_SECRET`: app secret de Meta.
 - `INSTAGRAM_REFRESH_MODE`: `facebook_exchange` (recomendado para cuenta profesional), `instagram_refresh` o `disabled`.
 - `INSTAGRAM_REFRESH_THRESHOLD_DAYS`: umbral para refrescar antes de expirar.
-- `INSTAGRAM_CAPTION_TEMPLATE`: plantilla del caption.
+- `INSTAGRAM_CAPTION_TEMPLATE`: plantilla del caption (opcional; si no se define, se usa un texto por defecto que invita a votar e incluye resultado y disclaimer).
 - `DAILY_POST_HOUR`: hora local de ejecución (por defecto `12`).
 - `DAILY_POST_MINUTE`: minuto local de ejecución (por defecto `0`).
 

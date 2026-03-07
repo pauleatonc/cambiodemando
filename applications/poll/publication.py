@@ -14,10 +14,18 @@ from .models import DailyPublication, InstagramTokenState
 
 
 class DailyCardGenerator:
-    """Genera el JPG diario desde la vista/template de composicion."""
+    """Genera el JPG diario desde la vista/template de composición."""
 
     width = 1080
     height = 1350
+
+    # Requisitos Meta/Instagram para imágenes (Graph API):
+    # - Formato: JPEG únicamente.
+    # - Tamaño máximo: 8 MB.
+    # - Espacio de color: sRGB (Chromium renderiza en sRGB por defecto).
+    # - Relación de aspecto: entre 1.91:1 y 4:5 (1080×1350 = 4:5 ✓).
+    JPEG_QUALITY_DEFAULT = 92
+    META_MAX_IMAGE_BYTES = 8 * 1024 * 1024  # 8 MB
 
     def _load_css(self):
         css_path = Path(settings.BASE_DIR) / 'applications' / 'countdown' / 'static' / 'countdown' / 'daily_card.css'
@@ -30,14 +38,28 @@ class DailyCardGenerator:
         return html, context
 
     def _capture_screenshot(self, html, out_path):
-        from playwright.sync_api import sync_playwright  # import tardio para no romper entornos sin dependencia
+        from playwright.sync_api import sync_playwright  # import tardío para no romper entornos sin dependencia
 
+        quality = self.JPEG_QUALITY_DEFAULT
         with sync_playwright() as p:
             browser = p.chromium.launch()
             page = browser.new_page(viewport={'width': self.width, 'height': self.height, 'device_scale_factor': 1})
             page.set_content(html, wait_until='networkidle')
-            page.screenshot(path=str(out_path), type='jpeg', quality=92, full_page=True)
+            page.screenshot(path=str(out_path), type='jpeg', quality=quality, full_page=True)
             browser.close()
+
+        # Meta: máximo 8 MB. Si se supera, regenerar con menor calidad.
+        for _ in range(3):
+            size = out_path.stat().st_size
+            if size <= self.META_MAX_IMAGE_BYTES:
+                break
+            quality = max(60, quality - 15)
+            with sync_playwright() as p:
+                browser = p.chromium.launch()
+                page = browser.new_page(viewport={'width': self.width, 'height': self.height, 'device_scale_factor': 1})
+                page.set_content(html, wait_until='networkidle')
+                page.screenshot(path=str(out_path), type='jpeg', quality=quality, full_page=True)
+                browser.close()
 
     def generate(self, publication_date=None, force=False):
         publication_date = publication_date or timezone.localdate()
@@ -76,6 +98,15 @@ class DailyCardGenerator:
 class InstagramPublisher:
     """Publica una imagen diaria usando Meta Graph API (Instagram Business/Creator)."""
 
+    # Caption por defecto si INSTAGRAM_CAPTION_TEMPLATE no está definido
+    DEFAULT_CAPTION = (
+        'Le guste o no, este es el tiempo que nos queda de este presidente. '
+        '¿Cómo vamos? Vote en nuestra encuesta diaria.\n\n'
+        'Bien: {good_pct}% | Mal: {bad_pct}% — {result_label}\n\n'
+        'Los votos son acumulativos y se puede votar una vez por día. '
+        'El sitio está en la bio.'
+    )
+
     def __init__(self):
         self.base_url = settings.INSTAGRAM_BASE_URL.rstrip('/')
         self.ig_user_id = settings.INSTAGRAM_IG_USER_ID
@@ -95,7 +126,7 @@ class InstagramPublisher:
             raise RuntimeError(f'Graph API unreachable: {exc.reason}') from exc
 
     def _caption(self, publication):
-        template = settings.INSTAGRAM_CAPTION_TEMPLATE
+        template = settings.INSTAGRAM_CAPTION_TEMPLATE or self.DEFAULT_CAPTION
         return template.format(
             good_pct=publication.good_pct_display,
             bad_pct=publication.bad_pct_display,

@@ -1,6 +1,6 @@
 """
 Lógica de negocio de la encuesta.
-Escala 20%: resultado según % Bien/Mal sobre el total.
+Resultado según % Mal sobre el total, en tramos de 10%.
 """
 from django.db.models import Count
 from django.utils import timezone
@@ -8,10 +8,37 @@ from django.utils import timezone
 from .models import Vote
 
 
+# Tramos de 10% según proporción de votos "mal" (de mayor a menor).
+# Cada tupla es (límite inferior de bad_pct, label).
+# Ej.: si bad_pct >= 0.9 → "Cerremos por fuera"; si bad_pct >= 0.8 y < 0.9 → "Como las weas", etc.
+RESULT_LABELS_BY_BAD_PCT = (
+    (0.90, "Cerremos por fuera"),
+    (0.80, "Como las weas"),
+    (0.70, "Chucha, me estoy preocupando"),
+    (0.60, "Se sabía igual..."),
+    (0.50, "Maomeno'nomá'"),
+    (0.40, "Piola"),
+    (0.30, "Buena perrooo..."),
+    (0.20, "Amerita piscolits"),
+    (0.10, "Soñao"),
+    (0.00, "Tamo' la raja"),  # 0–10% mal
+)
+
+DEFAULT_LABEL_NO_VOTES = "Maomeno'nomá'"
+
+
+def _result_label_for_bad_pct(bad_pct):
+    """Devuelve el label correspondiente al porcentaje de votos mal (0.0–1.0)."""
+    for threshold, label in RESULT_LABELS_BY_BAD_PCT:
+        if bad_pct >= threshold:
+            return label
+    return RESULT_LABELS_BY_BAD_PCT[-1][1]
+
+
 def get_poll_result():
     """
     Devuelve conteos, porcentajes y texto de resultado de la encuesta.
-    Returns: dict con good_count, bad_count, total, good_pct, bad_pct, result_label.
+    Returns: dict con good_count, bad_count, total, good_pct, bad_pct, result_label, etc.
     """
     agg = Vote.objects.values('option').annotate(count=Count('id'))
     counts = {r['option']: r['count'] for r in agg}
@@ -26,7 +53,7 @@ def get_poll_result():
             'total': 0,
             'good_pct': 0,
             'bad_pct': 0,
-            'result_label': "Maomeno' nomá'",
+            'result_label': DEFAULT_LABEL_NO_VOTES,
             'good_dash': 0,
             'bad_dash': 502,
             'good_gap': 502,
@@ -40,20 +67,7 @@ def get_poll_result():
 
     good_pct = round(good_count / total, 2)
     bad_pct = round(bad_count / total, 2)
-
-    # Escala por % Mal (de mayor a menor)
-    if bad_pct >= 0.80:
-        result_label = 'Como las weas'
-    elif bad_pct >= 0.60:
-        result_label = 'Mal, pero podría ser peor'
-    elif bad_pct >= 0.40:
-        result_label = "Maomeno' nomá'"
-    elif good_pct >= 0.80:
-        result_label = 'La raja'
-    elif good_pct >= 0.60:
-        result_label = 'Dentro de todo bien'
-    else:
-        result_label = "Maomeno' nomá'"
+    result_label = _result_label_for_bad_pct(bad_pct)
 
     # Circunferencia del arco SVG (r=80) para stroke-dasharray
     circumference = 502
@@ -84,7 +98,7 @@ def get_poll_result():
 
 
 def get_daily_poll_snapshot():
-    """Payload estable para composicion de imagen diaria y publicaciones."""
+    """Payload estable para composición de imagen diaria y publicaciones."""
     result = get_poll_result()
     return {
         'snapshot_date': timezone.localdate(),
