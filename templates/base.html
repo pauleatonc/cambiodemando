@@ -52,6 +52,19 @@
     </main>
 
     <footer class="site-footer">
+      {% if social_instagram_url or social_twitter_url %}
+      <nav class="footer-social" aria-label="Redes sociales">
+        <span class="footer-social-label">Síguenos:</span>
+        <ul class="footer-social-list">
+          {% if social_instagram_url %}
+          <li><a href="{{ social_instagram_url }}" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+          {% endif %}
+          {% if social_twitter_url %}
+          <li><a href="{{ social_twitter_url }}" target="_blank" rel="noopener noreferrer">X</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
       <nav class="footer-nav" aria-label="Enlaces legales">
         <a href="{% url 'pages:privacy' %}">Política de Privacidad</a>
         <span class="footer-sep" aria-hidden="true">&middot;</span>

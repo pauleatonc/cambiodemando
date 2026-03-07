@@ -15,4 +15,6 @@ def google_verification(request):
         'adsense_slot_rail_right': getattr(settings, 'ADSENSE_SLOT_RAIL_RIGHT', ''),
         'ga_measurement_id': getattr(settings, 'GA_MEASUREMENT_ID', ''),
         'current_year': datetime.now().year,
+        'social_instagram_url': getattr(settings, 'SOCIAL_INSTAGRAM_URL', '').strip() or None,
+        'social_twitter_url': getattr(settings, 'SOCIAL_TWITTER_URL', '').strip() or None,
     }

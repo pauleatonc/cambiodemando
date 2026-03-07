@@ -86,6 +86,39 @@ main {
   color: #666;
 }
 
+.footer-social {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.footer-social-label {
+  font-weight: 600;
+  color: #444;
+}
+
+.footer-social-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.footer-social-list a {
+  color: #1a5c97;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.footer-social-list a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .footer-nav {
   display: flex;
   justify-content: center;
