@@ -19,8 +19,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps',
     'applications.countdown',
     'applications.poll',
+    'applications.pages',
 ]
 
 MIDDLEWARE = [
@@ -74,6 +76,9 @@ STATICFILES_DIRS = [BASE_DIR / 'static'] if (BASE_DIR / 'static').exists() else 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
+# Contacto
+CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '')
+
 # AdSense
 ADSENSE_CLIENT = os.environ.get('ADSENSE_CLIENT', '')
 ADSENSE_SLOT_INLINE_TOP = os.environ.get('ADSENSE_SLOT_INLINE_TOP', '')
@@ -83,6 +88,9 @@ ADSENSE_SLOT_RAIL_RIGHT = os.environ.get('ADSENSE_SLOT_RAIL_RIGHT', '')
 
 # Verificación de sitio en Google AdSense (meta tag; valor = content del meta google-site-verification)
 GOOGLE_SITE_VERIFICATION = os.environ.get('GOOGLE_SITE_VERIFICATION', '')
+
+# Google Analytics 4 (ID de medición, p. ej. G-XXXXXXXXXX)
+GA_MEASUREMENT_ID = os.environ.get('GA_MEASUREMENT_ID', '')
 
 # Publicaciones diarias e Instagram
 SITE_BASE_URL = os.environ.get('SITE_BASE_URL', 'http://localhost:8000')

@@ -20,10 +20,6 @@
   margin: 0 auto;
 }
 
-.ad-rail {
-  display: none;
-}
-
 .countdown-content {
   display: flex;
   flex-direction: column;
@@ -58,32 +54,10 @@
   line-height: 1.5;
 }
 
-.ad-slot {
-  width: 100%;
-  margin: 1.25rem 0;
-}
-
 .ad-slot-inline {
+  width: 100%;
   max-width: 46rem;
-}
-
-.ad-slot-rail {
-  min-height: 600px;
-}
-
-.ad-slot-placeholder {
-  min-height: 120px;
-  border: 1px dashed #c8ccd0;
-  border-radius: 8px;
-  background: #fff;
-  color: #666;
-  font-size: 0.85rem;
-  display: grid;
-  place-items: center;
-}
-
-.ad-slot-rail .ad-slot-placeholder {
-  min-height: 600px;
+  margin: 1.25rem 0;
 }
 
 .countdown {
@@ -166,21 +140,7 @@
 
 @media (min-width: 1200px) {
   .countdown-shell {
-    max-width: 86rem;
-    display: grid;
-    grid-template-columns: minmax(160px, 1fr) minmax(0, 64rem) minmax(160px, 1fr);
-    gap: 1.25rem;
-    align-items: start;
-  }
-
-  .countdown-layout {
-    grid-column: 2;
-  }
-
-  .ad-rail {
-    display: block;
-    position: sticky;
-    top: 1rem;
+    max-width: 64rem;
   }
 }
 

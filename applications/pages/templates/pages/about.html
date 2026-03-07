@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<article class="page-article">
+  <h1>Acerca de Cambio de Mando</h1>
+
+  <section>
+    <h2>¿Qué es este sitio?</h2>
+    <p>
+      <strong>Cambio de Mando</strong> es un sitio independiente que muestra una
+      cuenta regresiva hasta el próximo cambio de mando presidencial en Chile,
+      el <strong>11 de marzo de 2030</strong>.
+    </p>
+    <p>
+      Además de la cuenta regresiva, incluimos una encuesta diaria donde los
+      visitantes pueden expresar su opinión sobre cómo van las cosas en el país.
+      Los resultados se publican diariamente en nuestras redes sociales.
+    </p>
+    <p>
+      Se puede votar 1 vez por día, y sus votos son anónimos y acumulativos. 
+      Por tanto, el resultado es sobre el total de votos. Desarrolladores posteriores 
+      podrían agregar otras formas de métricas. Por tanto, sus resultados no cuentan 
+      con rigor metodológico para ser considerados como encuestas oficiales.
+    </p>
+  </section>
+
+  <section>
+    <h2>¿Por qué existe?</h2>
+    <p>
+      El cambio de mando es un hito democrático que marca la transición del
+      poder ejecutivo. Este sitio nace como una herramienta informativa y
+      participativa: un reloj público que nos recuerda el ciclo democrático
+      y un espacio para tomar el pulso ciudadano.
+    </p>
+  </section>
+
+  <section>
+    <h2>¿Quién está detrás?</h2>
+    <p>
+      Cambio de Mando es un proyecto personal e independiente, sin afiliación
+      a ningún partido político, gobierno ni organización. No recibimos
+      financiamiento público ni privado; el sitio se sostiene exclusivamente
+      con el trabajo de su desarrollador.
+    </p>
+  </section>
+
+  <section>
+    <h2>Contacto</h2>
+    <p>
+      Si tienes preguntas, sugerencias o comentarios, visita nuestra
+      <a href="{% url 'pages:contact' %}">página de contacto</a>.
+    </p>
+  </section>
+</article>
+{% endblock %}

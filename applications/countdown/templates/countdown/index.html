@@ -15,22 +15,6 @@
   </header>
 
   <div class="countdown-shell">
-    <aside class="ad-rail ad-rail-left" aria-label="Publicidad lateral izquierda">
-      <div class="ad-slot ad-slot-rail">
-        {% if adsense_client and adsense_slot_rail_left %}
-        <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="{{ adsense_client }}"
-        data-ad-slot="{{ adsense_slot_rail_left }}"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        {% endif %}
-      </div>
-    </aside>
-
     <div class="countdown-layout">
       <img
         class="countdown-hero"
@@ -115,21 +99,6 @@
       </div>
     </div>
 
-    <aside class="ad-rail ad-rail-right" aria-label="Publicidad lateral derecha">
-      <div class="ad-slot ad-slot-rail">
-        {% if adsense_client and adsense_slot_rail_right %}
-        <ins class="adsbygoogle"
-        style="display:block"
-        data-ad-client="{{ adsense_client }}"
-        data-ad-slot="{{ adsense_slot_rail_right }}"
-        data-ad-format="auto"
-        data-full-width-responsive="true"></ins>
-        <script>
-        (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
-        {% endif %}
-      </div>
-    </aside>
   </div>
 </section>
 

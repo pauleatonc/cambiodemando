@@ -5,10 +5,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Cambio de mando{% endblock %}</title>
+    <meta name="description" content="{% block meta_description %}Cuenta regresiva hasta el próximo cambio de mando presidencial en Chile. Participa en la encuesta diaria.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}Cambio de Mando{% endblock %}">
+    <meta property="og:description" content="Cuenta regresiva hasta el próximo cambio de mando presidencial en Chile.">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="es_CL">
+    {% if google_site_verification %}
+    <meta name="google-site-verification" content="{{ google_site_verification }}">
+    {% endif %}
     {% if adsense_client %}
     <meta name="google-adsense-account" content="{{ adsense_client }}">
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client={{ adsense_client }}"
      crossorigin="anonymous"></script>
+    {% endif %}
+    {% if ga_measurement_id %}
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id={{ ga_measurement_id }}"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', '{{ ga_measurement_id }}');
+    </script>
     {% endif %}
     <link rel="icon" type="image/jpeg" href="{% static 'img/favicon.jpg' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,8 +37,29 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    <header class="site-header">
+      <nav class="site-nav" aria-label="Navegación principal">
+        <a href="{% url 'countdown:index' %}" class="site-logo">Cambio de Mando</a>
+        <ul class="nav-links">
+          <li><a href="{% url 'pages:about' %}">Acerca de</a></li>
+          <li><a href="{% url 'pages:contact' %}">Contacto</a></li>
+        </ul>
+      </nav>
+    </header>
+
     <main>
         {% block content %}{% endblock %}
     </main>
+
+    <footer class="site-footer">
+      <nav class="footer-nav" aria-label="Enlaces legales">
+        <a href="{% url 'pages:privacy' %}">Política de Privacidad</a>
+        <span class="footer-sep" aria-hidden="true">&middot;</span>
+        <a href="{% url 'pages:about' %}">Acerca de</a>
+        <span class="footer-sep" aria-hidden="true">&middot;</span>
+        <a href="{% url 'pages:contact' %}">Contacto</a>
+      </nav>
+      <p class="footer-copy">&copy; {{ current_year }} Cambio de Mando</p>
+    </footer>
 </body>
 </html>

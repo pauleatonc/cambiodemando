@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+{% block meta_description %}{{ meta_description }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'pages/pages.css' %}">
+{% endblock %}
+
+{% block content %}
+<article class="page-article">
+  <h1>Política de Privacidad</h1>
+  <p class="page-updated">Última actualización: marzo de 2026</p>
+
+  <section>
+    <h2>1. Información que recopilamos</h2>
+    <p>
+      Cambio de Mando (<strong>cambiodemando.cl</strong>) recopila información limitada
+      con el fin de mejorar la experiencia de los visitantes. La información que
+      podemos recopilar incluye:
+    </p>
+    <ul>
+      <li>
+        <strong>Datos de sesión:</strong> utilizamos cookies de sesión para
+        recordar si ya has votado en la encuesta diaria. Estas cookies no
+        contienen información personal identificable.
+      </li>
+      <li>
+        <strong>Datos de la encuesta:</strong> registramos los votos de forma anónima
+        (sin asociarlos a nombres, correos ni direcciones IP).
+      </li>
+      <li>
+        <strong>Datos de navegación:</strong> información técnica como tipo de
+        navegador, sistema operativo y páginas visitadas, recopilada
+        automáticamente por nuestro servidor.
+      </li>
+      <li>
+        <strong>Analíticas web:</strong> utilizamos Google Analytics para conocer
+        el número de visitas y el uso del sitio (páginas vistas, procedencia).
+        Los datos son agregados y anónimos. Más abajo detallamos el uso de
+        cookies de terceros.
+      </li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>2. Uso de cookies y tecnologías de terceros</h2>
+    <p>
+      Nuestro sitio utiliza <strong>Google AdSense</strong> para mostrar anuncios.
+      Google y sus partners tecnológicos pueden instalar y leer cookies en tu
+      navegador, o utilizar balizas web para recoger información con el fin de
+      mostrar anuncios personalizados. Puedes obtener más información sobre cómo
+      Google utiliza los datos en:
+    </p>
+    <p>
+      <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noopener noreferrer">
+        Cómo usa Google los datos de sitios y apps de partners
+      </a>
+    </p>
+    <p>
+      Puedes desactivar la publicidad personalizada visitando la
+      <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer">configuración de anuncios de Google</a>
+      o utilizando el complemento de inhabilitación de
+      <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">Google Analytics</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>3. Finalidad del tratamiento</h2>
+    <p>La información recopilada se utiliza exclusivamente para:</p>
+    <ul>
+      <li>Hacer funcionar la encuesta diaria y mostrar resultados agregados.</li>
+      <li>Mejorar el contenido y la experiencia del sitio.</li>
+      <li>Mostrar anuncios relevantes a través de Google AdSense.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>4. Compartir información</h2>
+    <p>
+      No vendemos, intercambiamos ni transferimos información personal a
+      terceros, salvo lo necesario para el funcionamiento de los servicios
+      publicitarios descritos en esta política.
+    </p>
+  </section>
+
+  <section>
+    <h2>5. Derechos del usuario</h2>
+    <p>
+      Puedes eliminar las cookies de tu navegador en cualquier momento desde
+      la configuración de tu navegador. Si tienes preguntas sobre esta política,
+      puedes contactarnos a través de nuestra
+      <a href="{% url 'pages:contact' %}">página de contacto</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>6. Cambios a esta política</h2>
+    <p>
+      Nos reservamos el derecho de actualizar esta política de privacidad. Los
+      cambios se publicarán en esta misma página con la fecha de actualización
+      correspondiente.
+    </p>
+  </section>
+</article>
+{% endblock %}
