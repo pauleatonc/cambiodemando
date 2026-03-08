@@ -53,6 +53,7 @@ services:
     environment:
       DJANGO_SETTINGS_MODULE: cambiodemando.settings.prod
       DB_HOST: db
+      TZ: America/Santiago
     volumes:
       - daily_media:/app/media
     depends_on:

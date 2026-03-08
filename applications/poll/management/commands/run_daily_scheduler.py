@@ -29,6 +29,17 @@ class Command(BaseCommand):
             target = target + timedelta(days=1)
         return target
 
+    def _should_run_today_now(self):
+        """True si ya pasó la hora de publicación de hoy (para no perder el run si el scheduler arrancó tarde)."""
+        now = timezone.localtime()
+        target_today = now.replace(
+            hour=settings.DAILY_POST_HOUR,
+            minute=settings.DAILY_POST_MINUTE,
+            second=0,
+            microsecond=0,
+        )
+        return now >= target_today
+
     def _execute_daily_flow(self):
         current_date = timezone.localdate().isoformat()
         self.stdout.write(f'[{datetime.now().isoformat()}] Ejecutando flujo diario para {current_date}')
@@ -44,8 +55,18 @@ class Command(BaseCommand):
             return
 
         self.stdout.write('Scheduler activo. Esperando proxima ventana diaria...')
+        last_run_date = None
         while True:
+            now = timezone.localtime()
             next_run = self._next_run()
+            # Si ya pasó la hora de hoy y aún no hemos ejecutado hoy, ejecutar ahora (evita perder el run si el contenedor arrancó después de las 12:00).
+            if self._should_run_today_now() and (last_run_date is None or last_run_date < now.date()):
+                self.stdout.write(
+                    f'[{datetime.now().isoformat()}] Ejecutando flujo de hoy (hora de publicación ya pasada).'
+                )
+                self._execute_daily_flow()
+                last_run_date = now.date()
+                next_run = self._next_run()
             wait_seconds = max(1, int((next_run - timezone.localtime()).total_seconds()))
             self.stdout.write(
                 f'[{datetime.now().isoformat()}] Proxima ejecucion a las {next_run.isoformat()} '
@@ -53,3 +74,4 @@ class Command(BaseCommand):
             )
             time.sleep(wait_seconds)
             self._execute_daily_flow()
+            last_run_date = timezone.localdate()

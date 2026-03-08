@@ -1,6 +1,7 @@
 import json
 import base64
-from datetime import datetime, timedelta
+import time
+from datetime import datetime, timedelta, timezone as dt_zone
 from pathlib import Path
 from urllib import error, parse, request
 
@@ -131,6 +132,38 @@ class InstagramPublisher:
         except error.URLError as exc:
             raise RuntimeError(f'Graph API unreachable: {exc.reason}') from exc
 
+    def _get(self, endpoint, params):
+        """GET request to Graph API; returns JSON."""
+        query = parse.urlencode(params)
+        url = f'{self.base_url.rstrip("/")}/{endpoint.lstrip("/")}?{query}'
+        req = request.Request(url, method='GET')
+        try:
+            with request.urlopen(req, timeout=25) as resp:
+                body = resp.read().decode('utf-8')
+                return json.loads(body)
+        except error.HTTPError as exc:
+            detail = exc.read().decode('utf-8')
+            raise RuntimeError(f'Graph API HTTP {exc.code}: {detail}') from exc
+        except error.URLError as exc:
+            raise RuntimeError(f'Graph API unreachable: {exc.reason}') from exc
+
+    def _wait_for_media_ready(self, creation_id, access_token, timeout_seconds=45, poll_interval=2):
+        """
+        Espera a que el contenedor de medios esté listo antes de publicar.
+        Meta devuelve 9007 "Media ID is not available" si se llama media_publish demasiado pronto.
+        """
+        status = ''
+        deadline = time.monotonic() + timeout_seconds
+        while time.monotonic() < deadline:
+            data = self._get(creation_id, {'fields': 'status_code', 'access_token': access_token})
+            status = (data.get('status_code') or '').upper()
+            if status == 'FINISHED':
+                return
+            if status in ('ERROR', 'EXPIRED'):
+                raise RuntimeError(f'Contenedor de medios en estado {status}: {data}')
+            time.sleep(poll_interval)
+        raise RuntimeError(f'Contenedor de medios no listo tras {timeout_seconds}s (último status: {status})')
+
     def _caption(self, publication):
         template = settings.INSTAGRAM_CAPTION_TEMPLATE or self.DEFAULT_CAPTION
         days_left = (TARGET_DATE.date() - publication.publication_date).days
@@ -162,6 +195,8 @@ class InstagramPublisher:
         if not creation_id:
             raise RuntimeError(f'Respuesta invalida create media: {create_data}')
 
+        self._wait_for_media_ready(creation_id, access_token)
+
         publish_data = self._post(
             f'{self.ig_user_id}/media_publish',
             {'creation_id': creation_id, 'access_token': access_token},
@@ -180,13 +215,17 @@ class InstagramPublisher:
 
 
 class XPublisher:
-    """Publica la imagen diaria en X (Twitter) con API v1.1 (OAuth 1.0a)."""
+    """Publica la imagen diaria en X (Twitter) con API v1.1 (OAuth 1.0a) para media y v2 para crear el tweet."""
 
     UPLOAD_URL = 'https://upload.twitter.com/1.1/media/upload.json'
-    UPDATE_URL = 'https://api.twitter.com/1.1/statuses/update.json'
+    TWEETS_V2_URL = 'https://api.twitter.com/2/tweets'  # v2: permitido en planes con "limited v1.1"
     MAX_STATUS_LENGTH = 280
-    # User-Agent explícito: algunos proxies (p. ej. Cloudflare) pueden rechazar peticiones con "python-requests"
-    REQUEST_HEADERS = {'User-Agent': 'cambiodemando/1.0 (+https://cambiodemando.com)'}
+    # Headers para que la respuesta no sea vacía (algunos proxies devuelven cuerpo con Accept: application/json)
+    REQUEST_HEADERS = {
+        'User-Agent': 'cambiodemando/1.0 (+https://cambiodemando.com)',
+        'Accept': 'application/json',
+        'Accept-Language': 'en-US,en;q=0.9',
+    }
 
     # Mismo contenido que caption de Instagram; se trunca a 280 caracteres.
     DEFAULT_STATUS_TEMPLATE = (
@@ -258,7 +297,7 @@ class XPublisher:
             headers=self.REQUEST_HEADERS,
             timeout=30,
         )
-        if resp.status_code != 200:
+        if resp.status_code not in (200, 202):
             self._raise_upload_error(resp, 'INIT')
         init_json = resp.json()
         media_id = init_json.get('media_id_string') or init_json.get('media_id')
@@ -291,7 +330,7 @@ class XPublisher:
             headers=self.REQUEST_HEADERS,
             timeout=30,
         )
-        if resp.status_code != 200:
+        if resp.status_code not in (200, 201):
             self._raise_upload_error(resp, 'FINALIZE')
         final_json = resp.json()
         media_id = final_json.get('media_id_string') or final_json.get('media_id')
@@ -345,17 +384,19 @@ class XPublisher:
         media_id = self._upload_media_chunked(image_path, auth)
 
         status_text = self._status_text(publication)
-        payload = {'status': status_text, 'media_ids': str(media_id)}
+        # API v2: POST /2/tweets con JSON (el plan actual solo permite v2 para crear tweets)
+        payload = {'text': status_text, 'media': {'media_ids': [str(media_id)]}}
+        headers = {**self.REQUEST_HEADERS, 'Content-Type': 'application/json'}
         resp = requests.post(
-            self.UPDATE_URL,
+            self.TWEETS_V2_URL,
             auth=auth,
-            data=payload,
-            headers=self.REQUEST_HEADERS,
+            json=payload,
+            headers=headers,
             timeout=30,
         )
-        if resp.status_code != 200:
+        if resp.status_code not in (200, 201):
             if getattr(self, 'debug', False):
-                self._log_response(resp, 'statuses/update')
+                self._log_response(resp, 'tweets v2')
             err_detail = (resp.text or '(empty response body)').strip()
             try:
                 err_json = resp.json()
@@ -369,9 +410,10 @@ class XPublisher:
                 err_detail = err_detail[:600] + '...'
             raise RuntimeError(f'X statuses/update failed: {resp.status_code} {err_detail}')
         tweet = resp.json()
-        tweet_id = tweet.get('id_str') or str(tweet.get('id', ''))
+        # v2 devuelve {"data": {"id": "123..."}}
+        tweet_id = (tweet.get('data') or {}).get('id') or tweet.get('id_str') or str(tweet.get('id', ''))
         if not tweet_id:
-            raise RuntimeError(f'X statuses/update response invalid: {tweet}')
+            raise RuntimeError(f'X tweets v2 response invalid: {tweet}')
 
         publication.x_tweet_id = tweet_id
         publication.x_published_at = timezone.now()
@@ -410,7 +452,7 @@ class InstagramTokenManager:
     def _parse_timestamp(self, raw_value):
         if not raw_value:
             return None
-        return datetime.fromtimestamp(int(raw_value), tz=timezone.utc)
+        return datetime.fromtimestamp(int(raw_value), tz=dt_zone.utc)
 
     def _http_get_json(self, base_url, endpoint, params):
         query = parse.urlencode(params)
