@@ -81,7 +81,7 @@ CONTACT_EMAIL = os.environ.get('CONTACT_EMAIL', '')
 
 # Redes sociales (para "Síguenos"; opcional, si está vacío no se muestra el bloque)
 SOCIAL_INSTAGRAM_URL = os.environ.get('SOCIAL_INSTAGRAM_URL', 'https://www.instagram.com/cambio_de_mando/')
-SOCIAL_TWITTER_URL = os.environ.get('SOCIAL_TWITTER_URL', '')
+SOCIAL_TWITTER_URL = os.environ.get('SOCIAL_TWITTER_URL', 'https://x.com/cambiodemando')
 
 # AdSense
 ADSENSE_CLIENT = os.environ.get('ADSENSE_CLIENT', '')

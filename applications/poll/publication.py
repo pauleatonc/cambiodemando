@@ -227,11 +227,11 @@ class XPublisher:
         'Accept-Language': 'en-US,en;q=0.9',
     }
 
-    # Mismo contenido que caption de Instagram; se trunca a 280 caracteres.
+    # Mismo contenido que caption de Instagram; se trunca a 280 caracteres. Incluye enlace a la web para votar.
     DEFAULT_STATUS_TEMPLATE = (
         '¿Cómo vamos? Guste o no, a nuestro presidente le quedan {dias} días en ejercicio. '
         'Participa en nuestra encuesta y cuéntanos tu opinión sobre su gestión. '
-        'El sitio en la bio. Hoy: Bien {good_pct}% | Mal {bad_pct}% — {result_label}'
+        'Vota en https://cambiodemando.com. Hoy: Bien {good_pct}% | Mal {bad_pct}% — {result_label}'
     )
 
     def __init__(self, debug=False):
